@@ -1,0 +1,21 @@
+{
+    "name": "lukiman/erik",
+    "description": "Base Framework",
+    "type": "framework",
+    "authors": [
+        {
+            "name": "Erik Lukiman",
+            "email": "erik.lukiman@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Lukiman\\": ""
+        }
+    },
+    "require": {
+        "nyholm/psr7-server": "^0.3.0",
+        "nyholm/psr7": "^1.2",
+        "swlib/swpdo": "dev-master"
+    }
+}
