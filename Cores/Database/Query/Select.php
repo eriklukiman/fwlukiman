@@ -11,20 +11,26 @@ class Select extends Database_Query {
 	protected $_groupBy = '';
 	protected $_useHaving = '';
 	protected $_useLimit = '';
+	protected $_rowCount = 0;
 	
-	public function execute($setting = 'default') {
+	public function execute(Database $db = null) {
+		parent::execute($db);
+		// if (is_null($db)) $db = $this->_db;
+		$db = $this->getValidDb($db);
 		if (is_array($this->_orderBy)) $this->_orderBy = implode(' , ', $this->_orderBy);
 		if (is_array($this->_groupBy)) $this->_groupBy = implode(' , ', $this->_groupBy);
 		if (is_array($this->_useHaving)) $this->_useHaving = implode(' , ', $this->_useHaving);
 		
 		if (is_array($this->_join)) $this->_join = implode(' ', $this->_join);
-		Database::activate($setting);
-		$this->_dbStatement = Database::Select($this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $this->_groupBy, $this->_useHaving, $this->_useLimit);
+		// Database::activate($setting);
+		$this->_dbStatement = Database::Select($db, $this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $this->_groupBy, $this->_useHaving, $this->_useLimit);
+		$this->_rowCount = $this->_dbStatement->rowCount();
 		return $this;
 	}
 	
 	public function count() {
-		return $this->_dbStatement->rowCount();
+		// return $this->_dbStatement->rowCount();
+		return $this->_rowCount;
 	}
 	
 	public function next() {
@@ -102,6 +108,7 @@ class Select extends Database_Query {
 		$this->_orderBy = '';
 		$this->_useHaving = '';
 		$this->_useLimit = '';
+		$this->_rowCount = 0;
 		return $this;
 	}
 	

@@ -52,7 +52,7 @@ class Base {
 		return self::$_path;
 	}
 	
-	public function execute ($action = 'Index', array $params) {
+	public function execute ($action = 'Index', array $params = null, Request $request = null) {
 		if (empty($action) OR ($action == 'Publics')) $action = 'Index';
 		$doAction = 'do_' . $action;
 		
@@ -60,8 +60,9 @@ class Base {
 			if ($action != 'Index') array_unshift($params, $action);
 			$doAction = 'do_Index';
 		}
-		
-        $this->catchRequestParams($params, $doAction);
+		// print_r($request);
+		// print_r($params);
+        $this->catchRequestParams($params, $request);
         
 		$this->beforeExecute();
 		$retVal = null;
@@ -102,8 +103,11 @@ class Base {
 		return $this->request;
 	}
 	
-	protected function catchRequestParams($params = '', $action = '') {
-        $this->request = new Request(/*$params, $action*/);
+	protected function catchRequestParams($params = null, $request = null) {
+		if (!is_null($request)) {
+			if (get_class($request) == Request::class) $this->request = $request;
+			else $this->request = new Request($request);
+		} else $this->request = new Request();
 	}
     
     public static function set_action($action = '') {

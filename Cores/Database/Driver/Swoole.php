@@ -2,25 +2,27 @@
 namespace Lukiman\Cores\Database\Driver;
 
 use \Lukiman\Cores\Interfaces\Database\{Basic, Transaction};
+use \Lukiman\Cores\Database\Config;
 use \Lukiman\Cores\Loader;
-use \Lukiman\Cores\Exception\Base;
+use \Lukiman\Cores\Exception\Base as Exception_Base;
 use \Swoole\Coroutine\MySQL;
 use \Swoole\Coroutine\Channel;
 use \Swlib\SwPDO;
 
 class Swoole /*extends \Swoole\Coroutine\MySQL*/  implements Basic, Transaction {
-	protected static $_instance = array();
+	protected static $_instance = null;
 	protected static $_free = array();
-	protected static $_lastSetting = 'default';
 	protected static $_databaseSetting = null;
 	protected $_inTransaction = false;
 	
-	protected static $_maxConnection = 2;
+	protected static $_maxConnection = 20;
 	protected static $_createdConnection = null;
-	// protected static $_connection = null;
+	protected static $_popTimeout = 2;
 	
 	protected $db = null;
 	public $bindMap = [];
+	
+	// protected $isUsed = false;
 	
 	public function __construct($dbType = 'mysql', $host = 'localhost', $user = '', $password = '', $dbName = '', $port = '', $options = array()) {
 		if (empty($port) AND ($dbType == 'mysql')) $port = 3306;
@@ -28,112 +30,70 @@ class Swoole /*extends \Swoole\Coroutine\MySQL*/  implements Basic, Transaction 
 		if (!empty($port)) $dsn .= ';port=' . $port;
 		if (!isset($options[PDO::ATTR_DEFAULT_FETCH_MODE])) $options[PDO::ATTR_DEFAULT_FETCH_MODE] = PDO::FETCH_OBJ;
 		try {
-			/*$connection = array(
-				'host' 		=> $host,
-				'user' 		=> $user,
-				'password' 	=> $password,
-				'database' 	=> $dbName,
-			);*/
-			// parent::__construct($dsn, $user, $password , $options);
-			// print_r($options);
-			/*$options = [
-				'mysql:host=127.0.0.1;dbname=event;charset=UTF8',
-				'rx',
-				'a'
-				];*/
-			// $db = SwPDO::construct(...$options);
 			$this->db = SwPDO::construct(...array($dsn, $user, $password, $options));
-			echo "\n++++";
-			print_r($this->db->client->errno);echo "=====\n";
 			if (!empty($this->db->client->errno)) {
-				echo "**********************\n";
-				var_dump($this);
 				throw new Exception\Base("DB connection error");
 			}
-			// $db->connect($connection);
-			// print_r($this->db);
-			
-			// print_r($connection);
-			
 		} catch (\Exception $e) {
-			// var_dump($e);
 			if ($e instanceof \Exception) 
-				// exit('Database Setting is invalid : ' . $e->getMessage());
-			//throw new Database_Error($e);
+				throw new Exception_Base("Failed to initialize DB connection");
 			die(__CLASS__ . ' : ' . $e->getMessage());
+
 		}
-		// self::$_instance[self::$_lastSetting] = $this;
 		return $this;
 	}
 	
-	public static function activate($setting = 'default') : void {
-		if (!empty($setting)) self::$_lastSetting = $setting;
-	}
-	
-	public static function getInstance($setting = 'default') : Object { 
-		if (empty($setting)) $setting = self::$_lastSetting;
-		
-		if (is_null(self::$_createdConnection)) {
-			self::$_createdConnection = new \Swoole\Atomic(0);//0;
-		}
-		// print_r(debug_print_backtrace(null, 2));
-		// echo "\n" . \Swoole\Coroutine::getuid() . "\n";
-		// if (is_null(self::$_connection)) self::$_connection = new \Swoole\Coroutine\Channel(self::$_maxConnection);
-		
+	public static function getInstance(?Config $config = null) : Object { 
+		// if (is_null(self::$_createdConnection)) {
+			// self::$_createdConnection = new \Swoole\Atomic(0);//0;
+		// }
 		$returnConn = null;
-		if(empty(self::$_instance[$setting])) {
-			self::$_instance[$setting] = new \Swoole\Coroutine\Channel(self::$_maxConnection);
+		// if(empty(self::$_instance[$setting])) {
+			// self::$_instance[$setting] = new \Swoole\Coroutine\Channel(self::$_maxConnection);
 			// self::$_instance[$setting] = array();
 			// self::$_instance[$setting] = new \SplQueue();
-		}
-		$coId = \Swoole\Coroutine::getuid();
-		// echo "getInstance request $coId\n";
-		// print_r(debug_print_backtrace(null, 4));
+		// }
 		$coList = array();
-		// if (!self::$_instance[$setting]->isEmpty()) $coList = self::$_instance[$setting]->pop();
-		// if (!self::$_instance[$setting]->isEmpty()) $coList = self::$_instance[$setting]->pop();
-		// if (!self::$_instance[$setting]->isEmpty()) $coList = self::$_instance[$setting]->pop();
-		// if(empty(self::$_instance[$setting]) OR empty()) {
-		// if(empty(self::$_instance[$setting][$coId])) {
-		if(self::$_instance[$setting]->isEmpty() AND self::$_createdConnection->get() <= self::$_maxConnection) {
-			// self::$_instance[$setting] = new \Swoole\Coroutine\Channel(1);
-			// print_r(debug_print_backtrace(null, 3));
-			if (empty(self::$_databaseSetting)) {
-				self::$_databaseSetting = Loader::Config('Database');
+		echo static::$_instance->isEmpty() .'!'. static::$_createdConnection->get() .'<'. static::$_maxConnection . "\n";
+		if(static::$_instance->isEmpty() AND (static::$_createdConnection->get() < static::$_maxConnection)) {
+			if (empty(static::$_databaseSetting)) {
+				static::$_databaseSetting = new Config(Loader::Config('Swoole_Database'));
 			}
-			if (!array_key_exists($setting, self::$_databaseSetting)) $setting = 'default';
-			$usedSetting = self::$_databaseSetting[$setting];
-			self::$_lastSetting = $setting;
-			$returnConn = new self($usedSetting['driver'], $usedSetting['connection']['host'], $usedSetting['connection']['user'], $usedSetting['connection']['password'], $usedSetting['connection']['database'], $usedSetting['connection']['port'], $usedSetting['options']); 
-			// print_r($returnConn);
-			echo "\n___ " . self::$_createdConnection->get() .  " ___\n";
+			$usedSetting = static::$_databaseSetting;
+			$returnConn = new static($usedSetting->engine, $usedSetting->host, $usedSetting->user, $usedSetting->password, $usedSetting->database, $usedSetting->port, $usedSetting->options); 
+			echo "\n___ " . static::$_createdConnection->get() .  " ___\n";
 			if (empty($returnConn)) {
-				$returnConn = self::$_instance[$setting]->pop();
-				throw new Exception\Base("Failed to initialize DB connection");
+				// $returnConn = self::$_instance->pop();
+				throw new Exception_Base("Failed to initialize DB connection.");
 			}
-			// $coList[$coId] = $returnConn;
 			// self::$_instance[$setting][$coId] = $returnConn;
-			// echo self::$_createdConnection . " $coId new Conn\n";
-			self::$_createdConnection->add();
+			static::$_createdConnection->add();
 			
-			// echo "=$coId=\n";
 		} else {
 			// $returnConn = self::$_instance[$setting]->pop();
-			// $returnConn = $coList[$coId];
-			// $returnConn = self::$_instance[$setting][$coId];
-			$returnConn = self::$_instance[$setting]->pop();
-			// echo " popped \n";
-			// print_r(debug_print_backtrace(null, 4));
+			// do {
+			$returnConn = static::$_instance->pop(static::$_popTimeout);
+			// } while ($returnConn->isUsed);
+			echo " popped \n";
+			if (false === $returnConn) {
+                throw new Exception_Base("Failed to pop DB connection.");
+            }
+			 // Defer (function() use ($returnConn) {// release
+				// echo " queued\n";
+                // static::$_instance->push($returnConn);
+            // });
 		}
 		// $returnConn->releaseConnection();
-		// self::$_instance[$setting]->push($coList);
+		// $returnConn->isUsed = true;
 		return $returnConn; 
 	} 
 	
-	public function releaseConnection($setting = 'default') {
-		self::$_instance[$setting]->push($this);
-		// print_r(self::$_instance[$setting]->count());
-		// print_r(self::$_instance[$setting]->length());
+	public function releaseConnection(/*$setting = 'default'*/) {
+		// print_r($this);
+		// $this->isUsed = false;
+		static::$_instance->push($this, static::$_popTimeout);
+		// print_r(self::$_instance->count());
+		// print_r(self::$_instance->length());
 		// echo " queued\n";
 	}
 	
@@ -152,19 +112,23 @@ class Swoole /*extends \Swoole\Coroutine\MySQL*/  implements Basic, Transaction 
 	
 	public function beginTransaction  () : void {
 		try {
-            parent::beginTransaction ();
+            $this->db->beginTransaction();
         } catch (Exception $e) {}
 		$this->_inTransaction = true;
 	}
 	
 	public function commit ($timeout = null) : void {
-		parent::commit();
+		$this->db->commit();
 		$this->_inTransaction = false;
 	}
 	
 	public function rollBack ($timeout = null) : void {
-		parent::rollBack();
+		$this->db->rollBack();
 		$this->_inTransaction = false;
+	}
+	
+	public function lastInsertId ($timeout = null) : int {
+		return $this->db->lastInsertId();
 	}
 	
 	public function bindValue($parameter, $variable, $type = PDO::PARAM_STR) {
@@ -218,7 +182,7 @@ class Swoole /*extends \Swoole\Coroutine\MySQL*/  implements Basic, Transaction 
 	
 	public function query(string $statement, float $timeout = 1.000) {
 		return $this->db->query($statement, $timeout);
-		$this->releaseConnection();
+		// $this->releaseConnection();
 	}
 	
 	/*public static function closeInstance($setting = 'default') {
@@ -234,8 +198,19 @@ class Swoole /*extends \Swoole\Coroutine\MySQL*/  implements Basic, Transaction 
 		// return $this->client->close();
 	}*/
 	
-	public static function getStats($setting = 'default') {
-		echo 'Stack size: ';
-		print_r(self::$_instance[$setting]->length()); echo "\n";
+	public static function getStats(/*$setting = 'default'*/) {
+		echo "\nStack size: ";
+		print_r(static::$_instance->length()); echo "\n";
+		// var_dump(static::$_instance);
+	}
+	
+	public static function setConfig(Config $config) {
+		static::$_databaseSetting = $config;
+	}
+	
+	public static function setParameters($instance, $maxConn, $createdConn) {
+		static::$_instance = $instance;
+		static::$_maxConnection = $maxConn;
+		static::$_createdConnection = $createdConn;
 	}
 }

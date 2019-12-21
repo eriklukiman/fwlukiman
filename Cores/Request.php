@@ -9,11 +9,9 @@ class Request {
 	protected $post;
 	protected $get;
 	protected $files;
+	protected $headers;
 
-    public function __construct (/*$params = '', $action = '', $body = '',*/ Psr\Http\Message\ServerRequestInterface $request = null) {
-        /*$this->params           = $params;
-        $this->action           = $action;
-        $this->body             = $body;*/
+    public function __construct (\Psr\Http\Message\ServerRequestInterface $request = null) {
 		
 		if (is_null($request)) {
 			$psr17Factory = new \Nyholm\Psr7\Factory\Psr17Factory();
@@ -25,14 +23,28 @@ class Request {
 			);
 			
 			$this->request = $creator->fromGlobals();
-			$this->post = $this->request->getParsedBody();
-			$this->get = $this->request->getQueryParams();
-			$this->files = $this->request->getUploadedFiles();
+			// $this->post = $this->request->getParsedBody();
+			// $this->get = $this->request->getQueryParams();
+			// $this->files = $this->request->getUploadedFiles();
 		} else {
 			$this->request = $request;
 		}
+			$this->post = $this->request->getParsedBody();
+			$this->get = $this->request->getQueryParams();
+			$this->files = $this->request->getUploadedFiles();
+			$this->body = $this->request->getBody()->getContents();
+			if (empty($this->body)) $this->body = key($this->post);
     }
     
+	public function getRequest() {
+		return $this->request;
+	}
+	
+	public function getHeaders($key = '') {
+		if (empty($key)) return $this->request->getHeaders();
+		else return $this->request->getHeader($key);
+	}
+	
     /**
      * Function for get data POST
      * @param type $key
@@ -129,7 +141,7 @@ class Request {
      * @return type
      */
     public function getBody() {
-        return $this->request->getBody();
+		return $this->body;
     }
     
     /**

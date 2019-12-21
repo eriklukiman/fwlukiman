@@ -1,6 +1,7 @@
 <?php
 namespace Lukiman\Cores\Controller;
 use \Lukiman\Cores\Controller;
+use \Lukiman\Cores\Request;
 
 class Json extends Controller {
 	protected $_error = 0;
@@ -10,13 +11,14 @@ class Json extends Controller {
 	public function beforeExecute() {
         parent::beforeExecute();
 		if (!headers_sent()) {
-			header('Access-Control-Allow-Origin: ' . (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : $_SERVER['REMOTE_ADDR'] ) );
+			header('Access-Control-Allow-Origin: ' . (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '') ) );
 			header( 'Access-Control-Allow-Credentials: true' );
+			header('Content-type: application/json');
 		}
 	}
 	
-	public function execute($action = 'Index', array $params) {
-		parent::execute($action, $params);
+	public function execute($action = 'Index', array $params = null, Request $request = null) {
+		parent::execute($action, $params, $request);
 		
 		$result = $this->getResult();
 		if ( $this->_error OR (is_array($result) AND !isset($result['status'])) ) $result['status'] = array(
@@ -29,7 +31,7 @@ class Json extends Controller {
 			$caller = $this->request->getGetVars('callback');
 			if (!empty($caller)) {
 				if (empty($caller) OR ($caller == '?')) $caller = 'FrameworkCallback';
-				if (!headers_sent()) header('Content-type: text/javascript');
+				// if (!headers_sent()) header('Content-type: text/javascript');
 				return $caller . '(' . json_encode($result) . ');';
 			} else return json_encode($result);
 		}

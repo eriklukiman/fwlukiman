@@ -15,14 +15,16 @@ class Grid extends Select {
 	protected $_pageName = 'page';
 	protected $_rowsPerPageName = 'max';
 	
-	public function __construct ($table = '') {
-		parent::__construct($table);
+	public function __construct ($table = '', Database $db = null) {
+		parent::__construct($table, $db);
         $this->request = new Request();
 		$this->_rowsPerPage = $this->_defaultRowsPerPage;
 		$this->_page = $this->_defaultPage;
 	}
 	
-	public function execute($setting = 'default') {
+	public function execute(Database $db = null) {
+		// parent::execute($db);
+		$db = $this->getValidDb($db);
 		if (is_array($this->_orderBy)) $this->_orderBy = implode(' , ', $this->_orderBy);
 		if (is_array($this->_groupBy)) $this->_groupBy = implode(' , ', $this->_groupBy);
 		if (is_array($this->_useHaving)) $this->_useHaving = implode(' , ', $this->_useHaving);
@@ -32,11 +34,16 @@ class Grid extends Select {
 		$this->limit( ($this->_page - 1) * $this->_rowsPerPage, $this->_rowsPerPage);
 		
 		if (is_array($this->_join)) $this->_join = implode(' ', $this->_join);
-		Database::activate($setting);
-		$this->_dbStatement = Database::Select($this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $this->_groupBy, $this->_useHaving, $this->_useLimit, true);
+		// Database::activate($setting);
+		// print_r($this);
+		$this->_dbStatement = Database::Select($db, $this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $this->_groupBy, $this->_useHaving, $this->_useLimit, true);
+		// print_r($this->_dbStatement);
+		// print_r($this);
 		// $rs1 = Database::getInstance()->query('SELECT FOUND_ROWS() ');
 		// echo $rs1->fetchColumn();
-		$this->countData();
+		$this->countData($db);
+		$db->releaseConnection();
+		// var_dump($this->_dbStatement->rowCount());
 		return $this;
 	}
 	
@@ -58,10 +65,12 @@ class Grid extends Select {
 		return $this;
 	}
 	
-	public function countData () {
+	public function countData (Database $db = null) {
 		if (empty($this->_totalRows)) {
-			$rs1 = Database::getInstance()->query('SELECT FOUND_ROWS() ');
-			$this->_rows = $this->count();
+			$db = $this->getValidDb($db);
+			$rs1 = $db->query('SELECT FOUND_ROWS() ');
+			// $this->_rows = $this->count();
+			$this->_rows = $this->_dbStatement->rowCount();
 			$this->_totalRows = $rs1->fetchColumn() + 0;
 			$this->_totalPage = ceil($this->_totalRows / $this->_rowsPerPage);
 		}
@@ -97,9 +106,13 @@ class Grid extends Select {
 			'page'			=> $this->getPage(),
 			'itemPerPage'	=> $this->getRowsPerPage(),
 			'totalPage'		=> $this->getTotalPage(),
-			'total'			=> $this->getRows(),
+			'data'			=> $this->getRows(),
 			'totalData'		=> $this->getTotalRows(),
 		);
+	}
+	
+	public function setRequest(Request $req) {
+		$this->request = $req;
 	}
 	
 	public function reset() {

@@ -2,12 +2,13 @@
 namespace Lukiman\Cores\Database;
 
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
+use \Lukiman\Cores\Database;
 use \Lukiman\Cores\StatusMessage;
 use \Lukiman\Cores\Database\Driver\PDO;
 use \Lukiman\Cores\Database\Driver\Swoole;
-use \Lukiman\Cores\Interfaces\Database\Operation;
+use \Lukiman\Cores\Interfaces\Database\{Basic, Transaction, Operation};
 
-class Base extends /*PDO*/ Swoole implements Operation {
+class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 	
 	public function __construct() {
 		$param = func_get_args();
@@ -17,8 +18,8 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		return $this;
 	}
 	
-	public static function Insert ($table = '', $arrValues = array()) : int {
-		$db = self::getInstance('');
+	public static function Insert (Database $db, $table = '', $arrValues = array()) : int {
+		// $db = self::getInstance('');
 
 		$startTrans = false;
 		if (!$db->inTransaction()) {
@@ -34,7 +35,7 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		if (is_array($arrValues)) {
 			$keys = array_keys($arrValues);
 			foreach ($arrValues AS $key => $val) {
-				$_var = generateRandomVariable();
+				$_var = self::generateRandomVariable();
 				if (is_array($val) AND isset($val['exp'])) {
 					$bindVars[$_var] = $val['exp'];
 					$arrData[] = $_var;
@@ -76,8 +77,8 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		else return $commit;
 	}
 	
-	public static function Update ($table = '', $arrValues = array(), $where = '1', $bindVars = array(), $join = '') : int {
-		$db = self::getInstance('');
+	public static function Update (Database $db, $table = '', $arrValues = array(), $where = '1', $bindVars = array(), $join = '') : int {
+		// $db = self::getInstance('');
 		
 		$startTrans = false;
 		if (!$db->inTransaction()) {
@@ -89,7 +90,7 @@ class Base extends /*PDO*/ Swoole implements Operation {
 
 		if (is_array($arrValues)) {
 			foreach ($arrValues as $key => $val) {
-				$_var = generateRandomVariable();
+				$_var = self::generateRandomVariable();
 				if (is_array($val)) {
 					$bindVars[$_var] = $val['exp'];
 					$arrSetValues[] = $key . ' = ' . $_var;
@@ -106,7 +107,7 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		} else {
 			if (empty($arrValues)) $commit = false;
 			else {
-				$_var = generateRandomVariable();
+				$_var = self::generateRandomVariable();
 				$bindVars[$_var] = $arrValues;
 				$arrSetValues[] = $_var;
 			}
@@ -134,8 +135,8 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		else return $commit;
 	}
 	
-	public static function Delete ($table = '', $where = '', $bindVars = array(), $limit = '') : int {
-		$db = self::getInstance('');
+	public static function Delete (Database $db, $table = '', $where = '', $bindVars = array(), $limit = '') : int {
+		// $db = self::getInstance('');
 
 		$useLimit = '';
 		if (!empty($limit)) {
@@ -173,9 +174,7 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		else return $commit;
 	}
 	
-	public static function Select ($table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having, $limit = '', $isGrid = false) : Object {
-		$db = self::getInstance('');
-		
+	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having, $limit = '', $isGrid = false) /*: /*Object*/ {
 		$arrData = array();
 
 		if (!empty($arrColumn) AND is_array($arrColumn)) {
@@ -204,46 +203,45 @@ class Base extends /*PDO*/ Swoole implements Operation {
 		}
 		
 		$q = $db->prepare('SELECT ' . ($isGrid ? ' SQL_CALC_FOUND_ROWS ' : '') . implode(', ', $arrData) . ' FROM ' . $table . ($join == '' ? '' : $join) . ' WHERE ' . self::generateWhere($where, $db) . $groupBy . $orderBy . $useHaving . $useLimit );
+
 		if ($q === false) {
 			var_dump($db);
-			return new Object();
+			return new \stdClass();
 		}
 		foreach ($bindVars as $kVar => $vVar) {
 			$q->bindValue($kVar, $vVar);
 		}
-		// echo '='. 'SELECT ' . ($isGrid ? ' SQL_CALC_FOUND_ROWS ' : '') . implode(', ', $arrData) . ' FROM ' . $table . ($join == '' ? '' : $join) . ' WHERE ' . self::generateWhere($where) . $groupBy . $orderBy . $useHaving . $useLimit .'=';
-		// var_dump($q);
+
 		if (!empty($limit)) {
 			if ($q === false) {
 				print_r($db);
 				throw new ExceptionBase('Database connection error!');
 			}
-				// var_dump($q);
+
 			$q->bindValue(':_usedLimit0', (int) $limit[0], PDO::PARAM_INT);
 			if (isset($limit[1])) $q->bindValue(':_usedLimit1', (int) $limit[1], PDO::PARAM_INT);
 		}
 		try {
 			$q->execute();
 		} catch (ExceptionBase $e) {
-			$db->releaseConnection();
 			if ($e instanceof ExceptionBase) die(__CLASS__ . ' : ' . $e->getMessage());
-			//throw new Database_Error($e);
+		} finally {
+			if (!$isGrid) $db->releaseConnection();
 		}
 
 		if ($q->errorCode() != 0) {
 			$err = $q->errorInfo();
             StatusMessage::query_error($err[1], $err[2], true);   
-			$db->releaseConnection();
-			//die($q->queryString . '<br />' . $err[2]) ;
+			die($q->queryString . '<br />' . $err[2]) ;
 		}
-		$db->releaseConnection();
+		// $db->releaseConnection();
 		return $q;
 
 	}
 	
 	public static function generateWhere ($where = '1', $db = null) : String {
 		$dbSupplied = true;
-		if ($db == null) {
+		if (is_null($db)) {
 			$db = self::getInstance('');
 			$dbSupplied = false;
 		}

@@ -1,7 +1,7 @@
 <?php
 return array (
 	'engine'	=> 'mysql',
-	'driver'	=> 'pdo',
+	'driver'	=> 'swoole',
 	'host'		=> 'localhost',
 	'port'		=> '3306',
 	'user'		=> 'rx',

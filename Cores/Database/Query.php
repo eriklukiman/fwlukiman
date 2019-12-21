@@ -11,6 +11,7 @@ class Query {
 	protected $_data = array();
 	protected $_where = array();
 	protected $_bindVars = array();
+	protected $_db = null;
 	
 	//static
 	public static function Insert ($table = '') {
@@ -34,8 +35,13 @@ class Query {
 	}
 
 	//non-static
-	public function __construct($table = '') {
+	public function __construct($table = '', Database $db = null) {
+		if (!is_null($db)) $this->_db = $db;
 		if (!empty($table)) $this->table($table);
+	}
+	
+	public function setDb(Database $db) {
+		$db = $this->getValidDb($db);
 	}
 	
 	public function getBindedVars() {
@@ -119,6 +125,15 @@ class Query {
 		return $this;
 	}
 	
-	public function execute() { }
+	public function execute(Database $db = null) { 
+		$db = $this->getValidDb($db);
+		if (is_null($db)) throw new ExceptionBase('Database connection error!');
+		
+		return $this;
+	}
 	
+	protected function getValidDb(Database $db = null) {
+		if (is_null($db)) $db = $this->_db;
+		return $db;
+	}
 }

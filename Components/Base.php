@@ -6,7 +6,12 @@ require_once('../includes/const.php');
 
 use \Lukiman\Cores\Controller;
 use \Lukiman\Cores\Database;
+use \Lukiman\Cores\Database\Config;
+use \Lukiman\Cores\Request;
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
+use \Nyholm\Psr7\Factory\Psr17Factory;
+use \Psr\Http\Message\ServerRequestInterface;
+use \Lukiman\Cores\Loader;
 
 $serviceStartTime = new \Swoole\Atomic();
 $port = 33000;
@@ -14,6 +19,25 @@ $port = 33000;
 // $http = new swoole_http_server("127.0.0.1", $port);
 $http = new \Swoole\HTTP\Server("127.0.0.1", $port);
 
+$psr17Factory = new Psr17Factory();
+$serverRequestFactory = new \Ilex\SwoolePsr7\SwooleServerRequestConverter(
+    $psr17Factory,
+    $psr17Factory,
+    $psr17Factory,
+    $psr17Factory
+);
+
+
+//database setting variables
+$dbMaxConnection = 1;
+$dbVariables = array(
+	'createdConnection'	=> new \Swoole\Atomic(0),
+	'instances'			=> new \Swoole\Coroutine\Channel($dbMaxConnection),
+	// 'instances'			=> new \SplQueue(),
+);
+Database::setParameters($dbVariables['instances'], $dbMaxConnection, $dbVariables['createdConnection']);
+$dbConfig = new Config(Loader::Config('Swoole_Database'));
+Database::setConfig($dbConfig);
 
 $http->on("start", function ($server) use ($port, &$serviceStartTime) {
     echo "Swoole http server is started at http://127.0.0.1:$port\n";
@@ -90,11 +114,14 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 		$response->header("Content-Type", "text/plain");
 		$response->end("OK\n");
 		// echo "\nNo excec Duration: " . (microtime(true) - $responseStartTime);
-	} else if ($fullPath == '/whoami/') {
+	} else if ($fullPath == '/whoami/' OR $fullPath == '/whoami') {
 		$response->header("Content-Type", "text/plain");
 		$response->end(getServerStatus());
 	} else {
 		// print_r($request);
+		// print_r($request->rawcontent());
+		
+		$psr7Request = $GLOBALS['serverRequestFactory']->createFromSwoole($request);
 		
 		$pathOri = $fullPath;
 		$path = explode('/', $fullPath);
@@ -126,7 +153,10 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 			}
 			Controller\Base::set_action($action);
 			// var_dump($class);
-			$retVal = Controller::load($class)->execute($action, $params);
+			// $retVal = Controller::load($class)->execute($action, $params);
+			$convertedReq = new Request($psr7Request);
+			// print_r($convertedReq);
+			$retVal = Controller::load($class)->execute($action, $params, $convertedReq);
 			// echo $retVal;	
 
 			$response->header("Content-Type", "application/json");
@@ -144,5 +174,5 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 $http->start();
 
 function getServerStatus() {
-	return "Service run at port {$GLOBALS['port']} for " . (time() - $GLOBALS['serviceStartTime']->get()) . " seconds.\n";
+	return "Service run at port {$GLOBALS['port']} for " . (time() - $GLOBALS['serviceStartTime']->get()) . " seconds.\n" . ExceptionBase::getStats() . "\n";
 }
