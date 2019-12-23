@@ -2,6 +2,7 @@
 namespace Lukiman\Cores\Database;
 
 use \Lukiman\Cores\Database;
+use \Lukiman\Cores\Exception\Base as ExceptionBase;
 use \Lukiman\Cores\Database\Query\{Grid, Insert, Delete, Update, Select};
 
 class Query {

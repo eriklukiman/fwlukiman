@@ -13,11 +13,18 @@ use \Nyholm\Psr7\Factory\Psr17Factory;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Lukiman\Cores\Loader;
 
-$serviceStartTime = new \Swoole\Atomic();
+// $serviceStartTime = new \Swoole\Atomic();
 $port = 33000;
 
-// $http = new swoole_http_server("127.0.0.1", $port);
-$http = new \Swoole\HTTP\Server("127.0.0.1", $port);
+$http = new swoole_http_server("127.0.0.1", $port);
+// $http = new \Swoole\HTTP\Server("127.0.0.1", $port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
+// $ssl_dir = '/home/erik/ssl/ca/intermediate/';
+/*$ssl_dir = '/etc/ssl';
+$http->set([
+    'ssl_cert_file' => $ssl_dir . '/certs/ssl-cert-snakeoil.pem',
+    'ssl_key_file' => $ssl_dir . '/ssl-cert-snakeoil.key',
+    'open_http2_protocol' => true,
+]);*/
 
 $psr17Factory = new Psr17Factory();
 $serverRequestFactory = new \Ilex\SwoolePsr7\SwooleServerRequestConverter(
@@ -38,13 +45,17 @@ $dbVariables = array(
 Database::setParameters($dbVariables['instances'], $dbMaxConnection, $dbVariables['createdConnection']);
 $dbConfig = new Config(Loader::Config('Swoole_Database'));
 Database::setConfig($dbConfig);
+// Database::populateConnectionPool($dbConfig);
 
-$http->on("start", function ($server) use ($port, &$serviceStartTime) {
-    echo "Swoole http server is started at http://127.0.0.1:$port\n";
-	$serviceStartTime->set(time());
+$http->on("start", function ($server) use ($port /*, &$serviceStartTime*/) {
+    echo "Swoole [ver." . SWOOLE_VERSION . "] http server is started at http://127.0.0.1:$port\n";
+	// $serviceStartTime->set(time());
 });
 
-
+// $http->on("WorkerStop", function ($server, $workerId) {
+	// echo 'bbbbbbbbbbbb';
+	// Process::close($workerId);
+// } );
 
 /*$http->on("request1", function ($request, $response) use ($port, $serviceStartTime) {
 	$responseStartTime = microtime(true);
@@ -174,5 +185,7 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 $http->start();
 
 function getServerStatus() {
-	return "Service run at port {$GLOBALS['port']} for " . (time() - $GLOBALS['serviceStartTime']->get()) . " seconds.\n" . ExceptionBase::getStats() . "\n";
+	$stats =  $GLOBALS['http']->stats();
+	// print_r($stats);
+	return "Service run at port {$GLOBALS['port']} for " . (time() - $stats['start_time']) . " seconds.\n" . ExceptionBase::getStats() . "\n" . print_r($stats, true);
 }

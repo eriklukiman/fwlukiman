@@ -32,7 +32,7 @@ class Tes extends General {
 		// print_r($_SERVER['PATH_INFO']);
 
 		$db = Database::getInstance();
-		Database_Query::Insert($db, $this->table_name)
+		Database_Query::Insert($this->table_name)
 		->data(array(
 			'testTime'	=> 'NOW()',
 			'testGet'	=> print_r($get, true),
@@ -41,7 +41,7 @@ class Tes extends General {
 			'testHeader'=> print_r($this->request->getHeaders(), true),
 			'testMethod'=> $method,
 		))
-		->execute();
+		->execute($db);
 		
 		return array('done');
 		/*return array(
@@ -74,9 +74,9 @@ class Tes extends General {
 	public function do_Select ($param) {
 		$status = $this->request->getPostVars('status');
 		
-		$shirt = Model::Load('Master\\Shoes');
+		$shoes = Model::Load('Master\\Shoes');
 		
-		$q = Database_Query::Grid($shirt->getTable());
+		$q = Database_Query::Grid($shoes->getTable());
 		$q->setRequest($this->request);
 		
 		$db = Database::getInstance();
@@ -92,5 +92,18 @@ class Tes extends General {
 		$ret['pagination'] = $q->getGridInfo();
 		// $db->releaseConnection();
 		return $ret;
+	}
+	
+	public function do_Summarized($param) {
+		return [
+			'param' 	=> $this->do_Param($param),
+			'select'	=> $this->do_Select($param)
+		];
+	}
+	
+	public function do_error($param) {
+		$shoes = Model::Load('Master\\Shoes1');
+		
+		return null;
 	}
 }
