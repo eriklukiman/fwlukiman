@@ -8,6 +8,7 @@ class Base {
 	protected static $_path = 'Modules/';
 	protected static $_prefixClass = 'Modules\\';
 	protected $result = '';
+	protected $headers = [];
     
     /*** @var Request */
     protected $request ;
@@ -93,6 +94,18 @@ class Base {
 	
 	protected function getResult () {
 		return $this->result;
+	}
+	
+	public function getHeaders() {
+		return $this->headers;
+	}
+	
+	protected function setHeaders(array $headers) {
+		$this->headers = $headers;
+	}
+	
+	protected function addHeaders(array $headers) {
+		$this->headers = array_merge($this->headers, $headers);
 	}
 	
 	protected function beforeExecute () {}

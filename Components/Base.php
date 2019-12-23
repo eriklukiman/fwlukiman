@@ -167,12 +167,14 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 			// $retVal = Controller::load($class)->execute($action, $params);
 			$convertedReq = new Request($psr7Request);
 			// print_r($convertedReq);
-			$retVal = Controller::load($class)->execute($action, $params, $convertedReq);
+			$ctrl = Controller::load($class);
+			$retVal = $ctrl->execute($action, $params, $convertedReq);
 			// echo $retVal;	
 
-			$response->header("Content-Type", "application/json");
+			$resHeaders = $ctrl->getHeaders();
+			foreach($resHeaders as $k => $v) $response->header($k, $v);
+			// $response->header("Content-Type", "application/json");
 			$response->end($retVal);
-			// echo "\nDuration: " . (microtime(true) - $responseStartTime);
 		} catch (ExceptionBase $e) {
 			$response->status(404);
 			$response->end($e->getMessage());

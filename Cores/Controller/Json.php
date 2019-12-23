@@ -10,11 +10,11 @@ class Json extends Controller {
 	
 	public function beforeExecute() {
         parent::beforeExecute();
-		if (!headers_sent()) {
-			header('Access-Control-Allow-Origin: ' . (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '') ) );
-			header( 'Access-Control-Allow-Credentials: true' );
-			header('Content-type: application/json');
-		}
+		$this->addHeaders(array(
+			// 'Access-Control-Allow-Origin' 		=> (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '') ),
+			'Access-Control-Allow-Credentials'	=> 'true',
+			'Content-type'						=> 'application/json',
+		));
 	}
 	
 	public function execute($action = 'Index', array $params = null, Request $request = null) {
