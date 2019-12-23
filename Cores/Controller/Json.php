@@ -8,17 +8,14 @@ class Json extends Controller {
 	protected $_errorCode = 0;
 	protected $_errorMessage = '';
 	
-	public function beforeExecute() {
-        parent::beforeExecute();
+	public function execute($action = 'Index', array $params = null, Request $request = null) {
+		parent::execute($action, $params, $request);
+		
 		$this->addHeaders(array(
 			// 'Access-Control-Allow-Origin' 		=> (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '') ),
 			'Access-Control-Allow-Credentials'	=> 'true',
 			'Content-type'						=> 'application/json',
 		));
-	}
-	
-	public function execute($action = 'Index', array $params = null, Request $request = null) {
-		parent::execute($action, $params, $request);
 		
 		$result = $this->getResult();
 		if ( $this->_error OR (is_array($result) AND !isset($result['status'])) ) $result['status'] = array(
@@ -35,6 +32,7 @@ class Json extends Controller {
 				return $caller . '(' . json_encode($result) . ');';
 			} else return json_encode($result);
 		}
+		return json_encode('');
 	}
 	
 	protected function setError($data) {
