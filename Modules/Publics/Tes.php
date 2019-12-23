@@ -22,7 +22,11 @@ class Tes extends General {
 		$this->table_name   = 'test';
     }
     
-	public function do_Index ($param) {
+	// public function do_Index ($param) {
+	
+	// }
+	
+	public function do_Insert ($param) {
 		$get = $this->getValueFromParameter('get');
 		$post = $this->getValuesFromPost();
 		$body = $this->request->getBody();
