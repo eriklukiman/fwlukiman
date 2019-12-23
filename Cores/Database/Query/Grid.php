@@ -44,6 +44,7 @@ class Grid extends Select {
 		$this->countData($db);
 		$db->releaseConnection();
 		// var_dump($this->_dbStatement->rowCount());
+		// var_dump($this->_dbStatement->result_set);
 		return $this;
 	}
 	
@@ -71,6 +72,7 @@ class Grid extends Select {
 			$rs1 = $db->query('SELECT FOUND_ROWS() ');
 			// $this->_rows = $this->count();
 			$this->_rows = $this->_dbStatement->rowCount();
+			if(empty($this->_rows) AND isset($this->_dbStatement->result_set)) $this->_rows = count($this->_dbStatement->result_set);
 			$this->_totalRows = $rs1->fetchColumn() + 0;
 			$this->_totalPage = ceil($this->_totalRows / $this->_rowsPerPage);
 		}

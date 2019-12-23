@@ -55,6 +55,7 @@ class Model {
 
 	public function getServerTimestamp() {
 		$q = $this->query('SELECT NOW() AS time ');
+		$this->releaseConnection();
 		foreach($q as $v) return $v->time;
 	}
 }
