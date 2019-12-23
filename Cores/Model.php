@@ -3,6 +3,7 @@ namespace Lukiman\Cores;
 
 use \Lukiman\Cores\Database;
 use \Lukiman\Cores\Database\Query as Database_Query;
+use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class Model {
 	protected static $_path = 'Models/';
@@ -37,7 +38,11 @@ class Model {
 		// var_dump($class);
 		// $class = '\Lukiman\\' . $class; 
 		// echo ':'.$class.':';
-		return new $class;
+		if (class_exists($class)) {
+			return new $class;
+		} else {
+			throw new ExceptionBase('Model not found!');
+		}
 	}
 	
 	public function getData ($id, array $cols = null) {
