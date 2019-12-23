@@ -48,7 +48,12 @@ if (!empty($_SERVER['PATH_INFO'])) {
 		Controller\Base::set_action($action);
 	// var_dump($class);
 	
-		$retVal = Controller::load($class)->execute($action, $params);
+		$ctrl = Controller::load($class);
+		$retVal = $ctrl->execute($action, $params);
+		if (!headers_sent()) {
+			$headers = $ctrl->getHeaders();
+			foreach($headers as $k => $v) header($k . ': ' . $v);
+		}
 		echo $retVal;
 	} catch (ExceptionBase $e) {
 		if (!headers_sent()) header('HTTP/1.0 404 Not Found');
