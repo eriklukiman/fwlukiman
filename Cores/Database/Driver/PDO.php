@@ -4,6 +4,7 @@ namespace Lukiman\Cores\Database\Driver;
 use \Lukiman\Cores\Interfaces\Database\{Basic, Transaction};
 use \Lukiman\Cores\Database\Config;
 use \Lukiman\Cores\Loader;
+use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class PDO extends \PDO implements Basic, Transaction {
 	protected static $_instance = array();
@@ -21,23 +22,27 @@ class PDO extends \PDO implements Basic, Transaction {
 		if (!isset($options[PDO::ATTR_DEFAULT_FETCH_MODE])) $options[PDO::ATTR_DEFAULT_FETCH_MODE] = PDO::FETCH_OBJ;
 		try {
 			parent::__construct($dsn, $user, $password, $options);
-		} catch (Exception $e) {
-			if ($e instanceof PDOException) 
-				throw new Exception_Base("Failed to initialize DB connection");
+		} catch (\Exception $e) {
+			if ($e instanceof \PDOException) 
+				throw new ExceptionBase($e->getMessage());
 			die(__CLASS__ . ' : ' . $e->getMessage());
 		}
 		return $this;
 	}
 	
 	public static function getInstance(?Config $config = null) : Object { 
-		if(empty(self::$_instance)) {
-			if (empty(self::$_databaseSetting)) {
-				self::$_databaseSetting = new Config(Loader::Config('Database'));
+		if(empty(static::$_instance)) {
+			$usedSetting = $config;
+			if (is_null($usedSetting)) {
+				if (empty(static::$_databaseSetting)) {
+					static::$_databaseSetting = new Config(Loader::Config('Database'));
+				}
+				$usedSetting = static::$_databaseSetting;
 			}
-			$usedSetting = self::$_databaseSetting;
+			if (empty($usedSetting)) throw new ExceptionBase("Failed to initialize DB connection");
 			static::$_instance = new static($usedSetting->engine, $usedSetting->host, $usedSetting->user, $usedSetting->password, $usedSetting->database, $usedSetting->port, $usedSetting->options); 
 		}
-		return self::$_instance; 
+		return static::$_instance; 
 	} 
 	
 	public function toQuote($string) : String {
@@ -51,7 +56,7 @@ class PDO extends \PDO implements Basic, Transaction {
 	public function beginTransaction  () : void {
 		try {
             parent::beginTransaction ();
-        } catch (PDOException $e) {}
+        } catch (\PDOException $e) {}
 		$this->_inTransaction = true;
 	}
 	
