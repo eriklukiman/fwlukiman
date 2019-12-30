@@ -134,7 +134,6 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 		
 		$psr7Request = $GLOBALS['serverRequestFactory']->createFromSwoole($request);
 		
-		$pathOri = $fullPath;
 		$path = explode('/', $fullPath);
 		if (empty($path[0])) array_shift($path);
 		if (end($path) == '') array_pop($path);
