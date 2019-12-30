@@ -32,12 +32,12 @@ class Base extends \Exception {
 	protected static function logException() {
 		self::$errorCount++;
 		// echo 'gggg';var_dump(static::$errorCount);
-		echo static::getStats();
+		// echo static::getStats();
 	}
 	
 	public static function getStats() {
 		// var_dump(static);
-		var_dump(static::$errorCount);
+		// var_dump(static::$errorCount);
 		return "Total exception(s): " . static::$errorCount . ".";
 	}
 }

@@ -25,7 +25,7 @@ if (!empty($fullPath)) {
 	$_path = $path;
 	foreach ($path as $k => $v) $path[$k] = ucwords(strtolower($v));
 	$class = implode('\\', $path);
-	print_r($class);
+	
 	$retVal = null;
 	$action = '';
 	$_param = '';

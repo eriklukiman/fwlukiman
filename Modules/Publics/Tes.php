@@ -76,8 +76,6 @@ class Tes extends General {
 	}
 	
 	public function do_Select ($param) {
-		$status = $this->request->getPostVars('status');
-		
 		$shoes = Model::Load('Master\\Shoes');
 		
 		$q = Database_Query::Grid($shoes->getTable());
@@ -106,7 +104,10 @@ class Tes extends General {
 	}
 	
 	public function do_error($param) {
-		$shoes = Model::Load('Master\\Shoes1');
+		// $shoes = Model::Load('Master\\Shoes1');
+		$q = Database_Query::SELECT('users1');
+		$db = Database::getInstance();
+		$q->execute($db);
 		
 		return null;
 	}

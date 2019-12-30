@@ -3,7 +3,6 @@ namespace Lukiman\Cores\Database;
 
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
 use \Lukiman\Cores\Database;
-use \Lukiman\Cores\StatusMessage;
 use \Lukiman\Cores\Database\Driver\PDO;
 use \Lukiman\Cores\Database\Driver\Swoole;
 use \Lukiman\Cores\Interfaces\Database\{Basic, Transaction, Operation};
@@ -19,8 +18,6 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 	}
 	
 	public static function Insert (Database $db, $table = '', $arrValues = array()) : int {
-		// $db = self::getInstance('');
-
 		$startTrans = false;
 		if (!$db->inTransaction()) {
 			$db->beginTransaction ();
@@ -70,16 +67,13 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		}
 		if ($q->errorCode() != 0) {
 			$err = $q->errorInfo();
-            StatusMessage::query_error($err[1], $err[2], true);   
-			//die($q->queryString . '<br />' . $err[2]) ;
+			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $insertId) return $insertId;
 		else return $commit;
 	}
 	
 	public static function Update (Database $db, $table = '', $arrValues = array(), $where = '1', $bindVars = array(), $join = '') : int {
-		// $db = self::getInstance('');
-		
 		$startTrans = false;
 		if (!$db->inTransaction()) {
 			$db->beginTransaction ();
@@ -128,16 +122,13 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		}
 		if ($q->errorCode() != 0) {
 			$err = $q->errorInfo();
-            StatusMessage::query_error($err[1], $err[2], true);   
-			//die($q->queryString . '<br />' . $err[2]) ;
+			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $affectedRows) return $affectedRows;
 		else return $commit;
 	}
 	
 	public static function Delete (Database $db, $table = '', $where = '', $bindVars = array(), $limit = '') : int {
-		// $db = self::getInstance('');
-
 		$useLimit = '';
 		if (!empty($limit)) {
 			if (!is_array($limit)) $useLimit .= ' LIMIT :_usedLimit ';
@@ -167,8 +158,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		}
 		if ($q->errorCode() != 0) {
 			$err = $q->errorInfo();
-            StatusMessage::query_error($err[1], $err[2], true);          
-            //die($q->queryString . '<br />' . $err[2]) ;
+			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $affectedRows) return $affectedRows;
 		else return $commit;
@@ -231,10 +221,8 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 
 		if ($q->errorCode() != 0) {
 			$err = $q->errorInfo();
-            StatusMessage::query_error($err[1], $err[2], true);   
-			die($q->queryString . '<br />' . $err[2]) ;
+			throw new ExceptionBase($err[0] . '(' . $err[1] . '): ' . $err[2], $err[1]);
 		}
-		// $db->releaseConnection();
 		return $q;
 
 	}
