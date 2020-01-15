@@ -53,68 +53,8 @@ $http->on("start", function ($server) use ($port /*, &$serviceStartTime*/) {
 });
 
 // $http->on("WorkerStop", function ($server, $workerId) {
-	// echo 'bbbbbbbbbbbb';
 	// Process::close($workerId);
 // } );
-
-/*$http->on("request1", function ($request, $response) use ($port, $serviceStartTime) {
-	$responseStartTime = microtime(true);
-	$path = $request->server['request_uri'];
-	if ($path == '/favicon.ico') {
-		$response->header("Content-Type", "text/plain");
-		$response->end("OK\n");
-		// echo "\nNo excec Duration: " . (microtime(true) - $responseStartTime);
-	} else if ($path == '/whoami/') {
-		$response->header("Content-Type", "text/plain");
-		$response->end("Service run at port $port for " . (time() - $serviceStartTime->get()) . " seconds.\n");
-	} else {
-		// print_r($request);
-		
-		$pathOri = $path;
-		$path = explode('/', $path);
-		if (empty($path[0])) array_shift($path);
-		if (end($path) == '') array_pop($path);
-		
-		$_path = $path;
-		foreach ($path as $k => $v) $path[$k] = ucwords(strtolower($v));
-		$class = implode('\\', $path);
-		
-		$retVal = null;
-		$action = '';
-		$_param = '';
-		$params = array();
-		while (!Controller::exists($class) AND !empty($class)) {
-			// echo Controller::exists($class);
-			if (!empty($action)) array_unshift($params, $_param);
-			$action = array_pop($path);
-			$_param = array_pop($_path);
-			// echo '---';var_dump($class);
-			$class = implode('\\', $path);
-			// var_dump($class);echo '+++';
-		}
-		
-		try {
-			if (empty($class)) {
-				// if (!headers_sent()) header('HTTP/1.0 404 Not Found');
-				throw new ExceptionBase('Handler not found!'); //error
-			}
-			Controller\Base::set_action($action);
-			// var_dump($class);
-			$retVal = Controller::load($class)->execute($action, $params);
-			// echo $retVal;	
-
-			$response->header("Content-Type", "application/json");
-			$response->end($retVal);
-			// echo "\nDuration: " . (microtime(true) - $responseStartTime);
-		} catch (ExceptionBase $e) {
-			// if (!headers_sent()) header('HTTP/1.0 404 Not Found');
-			$response->status(404);
-			echo $e->getMessage();
-			$response->end($e->getMessage());
-		}
-	}
-	echo "Duration: " . (microtime(true) - $responseStartTime) . "\n";
-});*/
 
 $http->on("request", 'requestHandler');
 
@@ -124,14 +64,11 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 	if ($fullPath == '/favicon.ico') {
 		$response->header("Content-Type", "text/plain");
 		$response->end("OK\n");
-		// echo "\nNo excec Duration: " . (microtime(true) - $responseStartTime);
 	} else if ($fullPath == '/whoami/' OR $fullPath == '/whoami') {
 		$response->header("Content-Type", "text/plain");
 		$response->end(getServerStatus());
+		echo getStats($fullPath, $responseStartTime);
 	} else {
-		// print_r($request);
-		// print_r($request->rawcontent());
-		
 		$psr7Request = $GLOBALS['serverRequestFactory']->createFromSwoole($request);
 		
 		$path = explode('/', $fullPath);
@@ -147,46 +84,40 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 		$_param = '';
 		$params = array();
 		while (!Controller::exists($class) AND !empty($class)) {
-			// echo Controller::exists($class);
 			if (!empty($action)) array_unshift($params, $_param);
 			$action = array_pop($path);
 			$_param = array_pop($_path);
-			// echo '---';var_dump($class);
 			$class = implode('\\', $path);
-			// var_dump($class);echo '+++';
 		}
 		
 		try {
 			if (empty($class)) {
-				// if (!headers_sent()) header('HTTP/1.0 404 Not Found');
 				throw new ExceptionBase('Handler not found!'); //error
 			}
 			Controller\Base::set_action($action);
-			// var_dump($class);
-			// $retVal = Controller::load($class)->execute($action, $params);
 			$convertedReq = new Request($psr7Request);
-			// print_r($convertedReq);
 			$ctrl = Controller::load($class);
 			$retVal = $ctrl->execute($action, $params, $convertedReq);
-			// echo $retVal;	
 
 			$resHeaders = $ctrl->getHeaders();
 			foreach($resHeaders as $k => $v) $response->header($k, $v);
-			// $response->header("Content-Type", "application/json");
 			$response->end($retVal);
 		} catch (ExceptionBase $e) {
 			$response->status(404);
 			$response->end($e->getMessage());
 			echo 'Error: ' . $e->getMessage();
 		}
+		echo getStats($fullPath, $responseStartTime);
 	}
-	echo "$fullPath (" . \Swoole\Coroutine::getuid() . ") :" . (microtime(true) - $responseStartTime) . ' ' . Database::getstats() . "\n";
 };
 
 $http->start();
 
+function getStats(string $fullPath, float $responseStartTime) {
+	return "$fullPath (" . \Swoole\Coroutine::getuid() . ") :" . (microtime(true) - $responseStartTime) . ' ' . Database::getstats() . "\n";
+}
+
 function getServerStatus() {
 	$stats =  $GLOBALS['http']->stats();
-	// print_r($stats);
 	return "Service run at port {$GLOBALS['port']} for " . (time() - $stats['start_time']) . " seconds.\n" . ExceptionBase::getStats() . "\n" . print_r($stats, true);
 }
