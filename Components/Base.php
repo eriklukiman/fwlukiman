@@ -13,7 +13,6 @@ use \Nyholm\Psr7\Factory\Psr17Factory;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Lukiman\Cores\Loader;
 
-// $serviceStartTime = new \Swoole\Atomic();
 $port = 33000;
 
 $http = new swoole_http_server("127.0.0.1", $port);
@@ -50,9 +49,8 @@ Database::setConfig($dbConfig);
 //Exception variables
 ExceptionBase::setCountVarContainer(new \Swoole\Atomic(0));
 
-$http->on("start", function ($server) use ($port /*, &$serviceStartTime*/) {
-    echo "Swoole [ver." . SWOOLE_VERSION . "] http server is started at http://127.0.0.1:$port\n";
-	// $serviceStartTime->set(time());
+$http->on("start", function ($server) use ($port) {
+    echo"Swoole [ver." . SWOOLE_VERSION . "] http server is started on http://127.0.0.1:$port at " .  date('Y-m-d H:i:sP') . "\n";
 });
 
 // $http->on("WorkerStop", function ($server, $workerId) {
@@ -117,10 +115,19 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 $http->start();
 
 function getStats(string $fullPath, float $responseStartTime) {
-	return "$fullPath (" . \Swoole\Coroutine::getuid() . ") : " . (microtime(true) - $responseStartTime) . ' ' . Database::getstats() . "\n";
+	return "$fullPath (" . \Swoole\Coroutine::getuid() . ") : " . (microtime(true) - $responseStartTime) . ' seconds ' . Database::getstats() . "\n";
 }
 
 function getServerStatus() {
 	$stats =  $GLOBALS['http']->stats();
-	return "Service run at port {$GLOBALS['port']} for " . (time() - $stats['start_time']) . " seconds.\n" . ExceptionBase::getStats() . "\n" . print_r($stats, true);
+	return "Service run at port {$GLOBALS['port']} for " . formatUpTime(time() - $stats['start_time']) . "\n" . ExceptionBase::getStats() . "\n" . print_r($stats, true);
+}
+
+function formatUpTime(int $time) : string {
+	 $formatedTime = date('z-G-i:s', $time);
+	 $arrTime = explode('-', $formatedTime);
+	 $arrTime[1] -= date('G', 0); // adjustment for timezone differences
+	 $retVal = "{$arrTime[1]}:{$arrTime[2]}";
+	 if (!empty($arrTime[0])) $retVal = $arrTime[0] . ' day(s) ' . $retVal;
+	 return $retVal;
 }
