@@ -47,6 +47,9 @@ $dbConfig = new Config(Loader::Config('Swoole_Database'));
 Database::setConfig($dbConfig);
 // Database::populateConnectionPool($dbConfig);
 
+//Exception variables
+ExceptionBase::setCountVarContainer(new \Swoole\Atomic(0));
+
 $http->on("start", function ($server) use ($port /*, &$serviceStartTime*/) {
     echo "Swoole [ver." . SWOOLE_VERSION . "] http server is started at http://127.0.0.1:$port\n";
 	// $serviceStartTime->set(time());
@@ -114,7 +117,7 @@ function requestHandler (\Swoole\Http\Request $request, \Swoole\Http\Response $r
 $http->start();
 
 function getStats(string $fullPath, float $responseStartTime) {
-	return "$fullPath (" . \Swoole\Coroutine::getuid() . ") :" . (microtime(true) - $responseStartTime) . ' ' . Database::getstats() . "\n";
+	return "$fullPath (" . \Swoole\Coroutine::getuid() . ") : " . (microtime(true) - $responseStartTime) . ' ' . Database::getstats() . "\n";
 }
 
 function getServerStatus() {

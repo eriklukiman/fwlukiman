@@ -6,8 +6,6 @@ class Base extends \Exception {
 	
 	public function __construct($message, $code = null, $severity = null, $filename = null, $lineno = null) {
 		parent::__construct($message, $code);
-		// echo static::$errorCount++;
-		// echo 'cccccccccccc';
 		static::logException();
 	}
     /*protected $severity;
@@ -30,14 +28,26 @@ class Base extends \Exception {
 	}*/
 	
 	protected static function logException() {
-		self::$errorCount++;
-		// echo 'gggg';var_dump(static::$errorCount);
-		// echo static::getStats();
+		if (gettype(static::$errorCount) == "object") {
+			static::$errorCount->add(1);
+		} else {
+			static::$errorCount++;
+		}
 	}
 	
 	public static function getStats() {
-		// var_dump(static);
-		// var_dump(static::$errorCount);
-		return "Total exception(s): " . static::$errorCount . ".";
+		return "Total exception(s): " . static::getExceptionCount() . ".";
+	}
+	
+	public static function setCountVarContainer($count) {
+		static::$errorCount =  $count;
+	}
+	
+	protected static function getExceptionCount() {
+		if (gettype(static::$errorCount) == "object") {
+			return static::$errorCount->get();
+		} else {
+			return static::$errorCount;
+		}
 	}
 }
