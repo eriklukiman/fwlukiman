@@ -1,5 +1,5 @@
 <?php
-// namespace Lukiman\Components;
+namespace Lukiman\Components;
 
 require_once('../vendor/autoload.php');
 require_once('../includes/preLoading.php');
@@ -17,15 +17,18 @@ use \Lukiman\Cores\Loader;
 
 /**
 * Running Configuration
-* Port:33000
+* Port: 33000
 **/
 class Base {
 	protected static int $port = 80;
+	
+	protected bool $shutdownAllowed = true;
 	protected string $logDest = 'console';
 	protected \Swoole\Http\Server $http;
-	protected $serverRequestFactory;
+	protected \Ilex\SwoolePsr7\SwooleServerRequestConverter $serverRequestFactory;
 	
 	public function __construct() {
+		$this->autoSetPort();
 		$this->http = new \swoole_http_server("127.0.0.1", static::$port);
 		
 		$psr17Factory = new Psr17Factory();
@@ -50,19 +53,63 @@ class Base {
 		
 		//Exception variables
 		ExceptionBase::setCountVarContainer(new \Swoole\Atomic(0));
-
+		
+		// $this->shutdownAllowed = false;
 	}
 	
 	protected function logs($message, $dest = null) : void {
 		if (empty($dest)) $dest = $this->logDest;
 		if ($dest == 'console') {
-			echo $message;
+			echo '[' . date('Y-m-d H:i:s') . ']' . $message . "\n";
 		}
 	}
 	
 	public function onStartHandler($server) {
-			$this->logs("Swoole [ver." . SWOOLE_VERSION . "] http server is started on http://127.0.0.1:" . static::$port . " at " .  date('Y-m-d H:i:sP') . "\n");
+		$this->logs("Swoole [ver." . SWOOLE_VERSION . "] http server at http://127.0.0.1:" . static::$port . " is started.");
+	}
+	
+	public function onShutdownHandler($server) {
+		$this->logs("Swoole [ver." . SWOOLE_VERSION . "] http server at http://127.0.0.1:" . static::$port . " is shutdown.");
+	}
+	
+	protected function requestHandler(string $fullPath, Request $request, \Swoole\Http\Response $response) {
+		
+		$path = explode('/', $fullPath);
+		if (empty($path[0])) array_shift($path);
+		if (end($path) == '') array_pop($path);
+		
+		$_path = $path;
+		foreach ($path as $k => $v) $path[$k] = ucwords(strtolower($v));
+		$class = implode('\\', $path);
+		
+		$retVal = null;
+		$action = '';
+		$_param = '';
+		$params = array();
+		while (!Controller::exists($class) AND !empty($class)) {
+			if (!empty($action)) array_unshift($params, $_param);
+			$action = array_pop($path);
+			$_param = array_pop($_path);
+			$class = implode('\\', $path);
 		}
+		
+		try {
+			if (empty($class)) {
+				throw new ExceptionBase('Handler not found!');
+			}
+			Controller\Base::set_action($action);
+			$ctrl = Controller::load($class);
+			$retVal = $ctrl->execute($action, $params, $request);
+
+			$resHeaders = $ctrl->getHeaders();
+			foreach($resHeaders as $k => $v) $response->header($k, $v);
+			$response->end($retVal);
+		} catch (ExceptionBase $e) {
+			$response->status(404);
+			$response->end($e->getMessage());
+			$this->logs('Error: ' . $e->getMessage());
+		}
+	}
 	
 	public function onRequestHandler(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
 		$responseStartTime = microtime(true);
@@ -70,57 +117,39 @@ class Base {
 		if ($fullPath == '/favicon.ico') {
 			$response->header("Content-Type", "text/plain");
 			$response->end("OK\n");
+		} else if (in_array($fullPath, ['/server/shutdown', '/server/stop'])) {
+			if ($this->shutdownAllowed) {
+				$response->end('Server shutdown now.');
+				$this->shutdown();
+			} else {
+				$response->status(401);
+				$response->end('Not authorized to shutdown this server.');
+				$this->logs("Error: Shutdown attempt denied!");
+			}
 		} else if ($fullPath == '/whoami/' OR $fullPath == '/whoami') {
 			$response->header("Content-Type", "text/plain");
 			$response->end($this->getServerStatus());
 			$this->logs($this->getStats($fullPath, $responseStartTime));
 		} else {
 			$psr7Request = $this->serverRequestFactory->createFromSwoole($request);
+			$convertedReq = new Request($psr7Request);
 			
-			$path = explode('/', $fullPath);
-			if (empty($path[0])) array_shift($path);
-			if (end($path) == '') array_pop($path);
-			
-			$_path = $path;
-			foreach ($path as $k => $v) $path[$k] = ucwords(strtolower($v));
-			$class = implode('\\', $path);
-			
-			$retVal = null;
-			$action = '';
-			$_param = '';
-			$params = array();
-			while (!Controller::exists($class) AND !empty($class)) {
-				if (!empty($action)) array_unshift($params, $_param);
-				$action = array_pop($path);
-				$_param = array_pop($_path);
-				$class = implode('\\', $path);
-			}
-			
-			try {
-				if (empty($class)) {
-					throw new ExceptionBase('Handler not found!'); //error
-				}
-				Controller\Base::set_action($action);
-				$convertedReq = new Request($psr7Request);
-				$ctrl = Controller::load($class);
-				$retVal = $ctrl->execute($action, $params, $convertedReq);
+			$this->requestHandler($fullPath, $convertedReq, $response);
 
-				$resHeaders = $ctrl->getHeaders();
-				foreach($resHeaders as $k => $v) $response->header($k, $v);
-				$response->end($retVal);
-			} catch (ExceptionBase $e) {
-				$response->status(404);
-				$response->end($e->getMessage());
-				$this->logs('Error: ' . $e->getMessage());
-			}
 			$this->logs($this->getStats($fullPath, $responseStartTime));
 		}
 	}
 
 	public function run() {
 		$this->http->on("start", [$this, 'onStartHandler']);
+		$this->http->on("shutdown", [$this, 'onShutdownHandler']);
 		$this->http->on("request", [$this, 'onRequestHandler']);
 		$this->http->start();
+	}
+	
+	public function shutdown() {
+		if ($this->shutdownAllowed) $this->http->shutdown();
+		else $this->logs("Error: Shutdown attempt denied!");
 	}
 	
 	protected function getStats(string $fullPath, float $responseStartTime) {
@@ -145,19 +174,21 @@ class Base {
 		static::$port = $port;
 	}
 	
+	protected function autoSetPort() : void {
+		$refl = new \ReflectionClass(__CLASS__);
+		$portDoc = $refl->getDocComment();
+		static::setPort(static::parsePort($portDoc));
+	}
+	
 	public static function parsePort(string $comment) : int {
-		preg_match('/port\:(\d+)/i', $comment, $result);
+		preg_match('/port\s*\:\s*(\d+)/i', $comment, $result);
 		if (!empty($result[1])) return $result[1];
 		else return static::$port;
 	}
 }
 
-$className = basename($argv[0], '.php');
+$className = __NAMESPACE__ . '\\' . basename($argv[0], '.php');
 $runMethod = !empty($argv[1]) ? $argv[1] : 'run';
-$refl = new \ReflectionClass($className);
-$portDoc = $refl->getDocComment();
-$className::setPort($className::parsePort($portDoc));
-// $obj = new "\\Lukiman\\Components\\" . $className();
 $obj = new $className();
 $obj->$runMethod();
 
