@@ -57,10 +57,11 @@ class Base {
 		// $this->shutdownAllowed = false;
 	}
 	
-	protected function logs($message, $dest = null) : void {
+	protected function logs($message, $type = 'INFO', $dest = null) : void {
 		if (empty($dest)) $dest = $this->logDest;
+		$output = '[' . date('Y-m-d H:i:s') . '] [' . $type . '] ' . $message . "\n";
 		if ($dest == 'console') {
-			echo '[' . date('Y-m-d H:i:s') . ']' . $message . "\n";
+			echo $output;
 		}
 	}
 	
@@ -107,7 +108,7 @@ class Base {
 		} catch (ExceptionBase $e) {
 			$response->status(404);
 			$response->end($e->getMessage());
-			$this->logs('Error: ' . $e->getMessage());
+			$this->logs($e->getMessage(), 'ERROR');
 		}
 	}
 	
@@ -124,7 +125,7 @@ class Base {
 			} else {
 				$response->status(401);
 				$response->end('Not authorized to shutdown this server.');
-				$this->logs("Error: Shutdown attempt denied!");
+				$this->logs("Shutdown attempt denied!", 'ERROR');
 			}
 		} else if ($fullPath == '/whoami/' OR $fullPath == '/whoami') {
 			$response->header("Content-Type", "text/plain");
@@ -149,11 +150,11 @@ class Base {
 	
 	public function shutdown() {
 		if ($this->shutdownAllowed) $this->http->shutdown();
-		else $this->logs("Error: Shutdown attempt denied!");
+		else $this->logs("Shutdown attempt denied!", 'ERROR');
 	}
 	
 	protected function getStats(string $fullPath, float $responseStartTime) {
-		return "$fullPath (" . \Swoole\Coroutine::getuid() . ") : " . (microtime(true) - $responseStartTime) . ' seconds ' . Database::getstats() . "\n";
+		return "$fullPath (" . \Swoole\Coroutine::getuid() . ") : " . (microtime(true) - $responseStartTime) . ' seconds ' . Database::getstats();
 	}
 
 	protected function getServerStatus() {
