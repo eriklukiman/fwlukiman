@@ -26,7 +26,7 @@ class Base {
 	protected string $logDest = 'console';
 	protected \Swoole\Http\Server $http;
 	protected \Ilex\SwoolePsr7\SwooleServerRequestConverter $serverRequestFactory;
-	protected \Swoole\Table $trackers;
+	protected \Swoole\Table $tracker;
 	
 	public function __construct() {
 		$this->autoSetPort();
@@ -55,7 +55,15 @@ class Base {
 		//Exception variables
 		ExceptionBase::setCountVarContainer(new \Swoole\Atomic(0));
 		
+		$this->createTrackers();
+		
 		// $this->shutdownAllowed = false;
+	}
+	
+	private function createTrackers() {
+		$this->tracker = new \Swoole\Table(1024);
+		$this->tracker->column('count', \Swoole\Table::TYPE_INT);
+		$this->tracker->create();		
 	}
 	
 	protected function logs($message, $type = 'INFO', $dest = null) : void {
@@ -139,6 +147,8 @@ class Base {
 			$this->requestHandler($fullPath, $convertedReq, $response);
 
 			$this->logs($this->getStats($fullPath, $responseStartTime));
+			
+			$this->tracker->incr($fullPath, 'count');
 		}
 	}
 
@@ -160,7 +170,14 @@ class Base {
 
 	protected function getServerStatus() {
 		$stats =  $this->http->stats();
-		return "Service run at port " . static::$port . " for " . $this->formatUpTime(time() - $stats['start_time']) . "\n" . ExceptionBase::getStats() . "\n" . print_r($stats, true);
+		$total = 0;
+		$trackerDetail = '';
+		foreach($this->tracker as $key => $value) {
+			$trackerDetail .= '- ' . $key . ' : ' .  $value['count'] . "\n";
+			$total += $value['count'];
+		}
+		$tracker = "\nStats per URL: (Total: {$total})\n" . $trackerDetail;
+		return "Service run at port " . static::$port . " for " . $this->formatUpTime(time() - $stats['start_time']) . "\n" . ExceptionBase::getStats() . "\n" . $tracker;
 	}
 
 	protected function formatUpTime(int $time) : string {
