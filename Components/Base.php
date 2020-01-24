@@ -22,10 +22,11 @@ use \Lukiman\Cores\Loader;
 class Base {
 	protected static int $port = 80;
 	
-	protected bool $shutdownAllowed = true;
+	protected bool $shutdownAllowed = false;
 	protected string $logDest = 'console';
 	protected \Swoole\Http\Server $http;
 	protected \Ilex\SwoolePsr7\SwooleServerRequestConverter $serverRequestFactory;
+	protected \Swoole\Table $trackers;
 	
 	public function __construct() {
 		$this->autoSetPort();
