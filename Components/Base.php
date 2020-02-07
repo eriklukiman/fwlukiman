@@ -13,6 +13,7 @@ use \Lukiman\Cores\Request;
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
 use \Nyholm\Psr7\Factory\Psr17Factory;
 use \Psr\Http\Message\ServerRequestInterface;
+use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Loader;
 
 /**
@@ -51,6 +52,10 @@ class Base {
 		$dbConfig = new Config(Loader::Config('Swoole_Database'));
 		Database::setConfig($dbConfig);
 		// Database::populateConnectionPool($dbConfig);
+		
+		$cacheConfig = Loader::Config('Cache');
+		$cacheConfig = array('engine' => 'redis', 'port' => 6379) + $cacheConfig;
+		Cache::setConfig($cacheConfig);
 		
 		//Exception variables
 		ExceptionBase::setCountVarContainer(new \Swoole\Atomic(0));
