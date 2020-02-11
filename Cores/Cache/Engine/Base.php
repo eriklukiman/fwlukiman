@@ -9,5 +9,5 @@ abstract class Base implements ICache {
 	
 	abstract public function get(String $id);
 	
-	abstract public function set(String $id, $value);
+	abstract public function set(String $id, $value, ?int $ttl);
 }

@@ -16,8 +16,8 @@ class Apc extends Base implements ICache {
 		return apc_fetch($id);
 	}
 	
-	public function set(String $id, $value) {
-		return apc_store($id, $value);
+	public function set(String $id, $value, ?int $ttl = 0) {
+		return apc_store($id, $value, $ttl);
 	}
 
 }

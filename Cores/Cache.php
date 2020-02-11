@@ -44,7 +44,7 @@ class Cache implements Interfaces\Cache {
 		return $this->cache->get($id);
 	}
 	
-	public function set(String $id, $value) {
-		return $this->cache->set($id, $value);
+	public function set(String $id, $value, ?int $ttl = null) {
+		return $this->cache->set($id, $value, $ttl);
 	}
 }
