@@ -189,6 +189,10 @@ class Base {
 		 $formatedTime = date('z-G-i:s', $time);
 		 $arrTime = explode('-', $formatedTime);
 		 $arrTime[1] -= date('G', 0); // adjustment for timezone differences
+		 if ($arrTime[1] < 0) {
+			 $arrTime[1] += 24;
+			 $arrTime[0]--;
+		 }
 		 $retVal = "{$arrTime[1]}:{$arrTime[2]}";
 		 if (!empty($arrTime[0])) $retVal = $arrTime[0] . ' day(s) ' . $retVal;
 		 return $retVal;
