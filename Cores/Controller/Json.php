@@ -50,13 +50,6 @@ class Json extends Controller {
 		return $this;
 	}
 	
-	protected function setReturnCode($error) {
-		$this->_error = ($error < 100) ? 0 : 1;
-		$this->_errorCode = $error;
-		$this->_errorMessage = StatusMessage::messageString($error);
-		return $this;
-	}
-	
 	protected function getError() {
 		return array(
 			'error'		=> $this->_error,
