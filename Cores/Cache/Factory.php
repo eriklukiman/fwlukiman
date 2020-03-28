@@ -2,7 +2,6 @@
 namespace Lukiman\Cores\Cache;
 
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
-use \Lukiman\Cores\Interfaces\Cache as ICache;
 
 class Factory {
 	private static String $path = '\\Lukiman\\Cores\\Cache\\Engine\\';
