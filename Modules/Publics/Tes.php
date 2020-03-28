@@ -5,6 +5,9 @@ use \Lukiman\Cores\Model;
 use \Lukiman\Cores\Database;
 use \Lukiman\Cores\Database\Query as Database_Query;
 use \Lukiman\Modules\General;
+use \Lukiman\Cores\Cache;
+use \Lukiman\Cores\Authentication;
+use \Lukiman\Cores\Data\Authentication as AuthData;
 
 class Tes extends General {
     
@@ -111,4 +114,46 @@ class Tes extends General {
 		
 		return null;
 	}
+	
+	public function do_Cache() {
+		$cache = Cache::getInstance();
+		$key = 'def';
+		$val = $cache->get($key);
+		if (empty($val)) {
+			$cache->set($key, date('Y-m-d H:i:s'), 10);
+			$val = $cache->get($key);
+		}
+		// var_dump($cache);
+		// var_dump($val);
+		return $val;
+		
+	}
+	
+	public function do_Auth() {
+		// $config = ['provider' => 'google'];
+		// $auth = new Authentication($config);
+		$auth = new Authentication();
+		$token = '';
+		$get = $this->getValueFromParameter('get');
+		if (!empty($get['token'])) $token = $get['token'];
+		
+		// $a = new AuthData();
+		// echo $a->getName();
+		// $a->setName('test123');
+		// $a->setEmail('ddd');
+		// var_dump($a);
+		// echo $a->getName();
+		
+		$auth->authWithToken($token);
+	
+		$cred = $auth->getCredentials();
+		print_r($cred);
+		if (!empty($cred)) print_r($cred->getUserName());
+		// var_dump($auth);
+		// $auth->revokeAuthentication();
+		return ($auth->isAuthenticated() ? 'OK' : 'Failed');
+
+	}
+	
+	
 }
