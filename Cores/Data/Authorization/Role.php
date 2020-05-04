@@ -52,7 +52,7 @@ class Role extends Base {
 		if (!$this->isModuleExist($detail->getName())) {
 			$this->permissions[$detail->getName()] = $detail;
 		} else {
-			$this->permissions[$detail->getName()]->setOperation(array_unique(array_merge($this->permissions[$detail->getName()]->getOperation(), $detail->getOperation()))); 
+			$this->permissions[$detail->getName()]->setOperations(array_unique(array_merge($this->permissions[$detail->getName()]->getOperations(), $detail->getOperations()))); 
 		}
 		return $this;
 	}

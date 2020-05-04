@@ -5,14 +5,14 @@ use \Lukiman\Cores\Data\Base as Base;
 
 class Permission extends Base {
 	private String $name;
-	private array $operation;
+	private array $operations;
 	
 	const defaultName = '_general_';
 	
-	public function __construct(String $lName = '', array $lOperation = array()) {
+	public function __construct(String $lName = '', array $operations = array()) {
 		if (empty($lName)) $lName = self::defaultName;
 		$this->name = strtolower($lName);
-		$this->setOperation($lOperation);
+		$this->setOperations($operations);
 	}
 	
 	public function getName() : String {
@@ -25,23 +25,23 @@ class Permission extends Base {
 		return $this;
 	}
 
-	public function getOperation() : array {
-		return $this->operation;
+	public function getOperations() : array {
+		return $this->operations;
 	}
 
-	public function setOperation(array $operation) : self {
+	public function setOperations(array $operations) : self {
 		$used = array();
-		foreach($operation as $v) {
-			$used[] = strtolower($v);
+		foreach($operations as $operation) {
+			$used[] = strtolower($operation);
 		}
-		$this->operation = $used;
+		$this->operations = $used;
 		return $this;
 	}
 	
 	public function add(String $op) : self {
 		$op = strtolower($op);
 		if (!$this->isAuthorized($op)) {
-			$this->operation[] = $op;
+			$this->operations[] = $op;
 		}
 		return $this;
 	}
@@ -49,15 +49,15 @@ class Permission extends Base {
 	public function remove(String $op) : self {
 		$op = strtolower($op);
 		if ($this->isAuthorized($op)) {
-			$key = array_search($op, $this->operation);
-			unset($this->operation[$key]);
+			$key = array_search($op, $this->operations);
+			unset($this->operations[$key]);
 		}
 		return $this;
 	}
 	
 	public function isAuthorized(String $operation) : bool {
 		$operation = strtolower($operation);
-		return in_array($operation, $this->operation);
+		return in_array($operation, $this->operations);
 	}
 	
 	public function __call($_name, $_arguments) {
