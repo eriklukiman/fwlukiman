@@ -9,9 +9,9 @@ class Permission extends Base {
 	
 	const defaultName = '_general_';
 	
-	public function __construct(String $lName = '', array $operations = array()) {
-		if (empty($lName)) $lName = self::defaultName;
-		$this->name = strtolower($lName);
+	public function __construct(String $name = '', array $operations = array()) {
+		if (empty($name)) $name = self::defaultName;
+		$this->name = strtolower($name);
 		$this->setOperations($operations);
 	}
 	
@@ -36,39 +36,5 @@ class Permission extends Base {
 		}
 		$this->operations = $used;
 		return $this;
-	}
-	
-	public function add(String $op) : self {
-		$op = strtolower($op);
-		if (!$this->isAuthorized($op)) {
-			$this->operations[] = $op;
-		}
-		return $this;
-	}
-	
-	public function remove(String $op) : self {
-		$op = strtolower($op);
-		if ($this->isAuthorized($op)) {
-			$key = array_search($op, $this->operations);
-			unset($this->operations[$key]);
-		}
-		return $this;
-	}
-	
-	public function isAuthorized(String $operation) : bool {
-		$operation = strtolower($operation);
-		return in_array($operation, $this->operations);
-	}
-	
-	public function __call($_name, $_arguments) {
-		$prefix  = substr($_name, 0, 3);
-		$operation = strtolower(substr($_name, 3));
-		
-		if ($prefix === "can") {
-			return $this->isAuthorized($operation);
-		} else {
-			parent::__call($_name, $_arguments);
-		}
-	
 	}
 }

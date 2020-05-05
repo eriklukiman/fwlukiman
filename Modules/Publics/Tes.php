@@ -7,9 +7,8 @@ use \Lukiman\Cores\Database\Query as Database_Query;
 use \Lukiman\Modules\General;
 use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Authentication;
-use \Lukiman\Cores\Data\Authentication as AuthData;
-use \Lukiman\Cores\Data\Authorization\Role;
-use \Lukiman\Cores\Data\Authorization\Permission;
+/use \Lukiman\Cores\Authorization\Role;
+use \Lukiman\Cores\Authorization\Permission;
 
 class Tes extends General {
     
@@ -158,21 +157,8 @@ class Tes extends General {
 	}
 	
 	public function do_Authorization() {
-		// $config = ['provider' => 'google'];
-		// $auth = new Authentication($config);
-		/*$auth = new Authentication();
-		$token = '';
-		$get = $this->getValueFromParameter('get');
-		if (!empty($get['token'])) $token = $get['token'];
-		*/
-		// $a = new AuthData();
-		// echo $a->getName();
-		// $a->setName('test123');
-		// $a->setEmail('ddd');
-		// var_dump($a);
-		// echo $a->getName();
-		// abc();
-		$auth = new Permission("master", ['read', 'Modify']);
+		echo '<pre>';
+		$auth = new Permission("master", ['read', 'MoDify']);
 		$auth1 = new Permission("master", ['write', 'modify']);
 		$auth2 = new Permission("print_report", ['read', 'view']);
 		$auth3 = new Permission();
