@@ -7,7 +7,7 @@ use \Lukiman\Cores\Database\Query as Database_Query;
 use \Lukiman\Modules\General;
 use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Authentication;
-/use \Lukiman\Cores\Authorization\Role;
+use \Lukiman\Cores\Authorization\Role;
 use \Lukiman\Cores\Authorization\Permission;
 
 class Tes extends General {
