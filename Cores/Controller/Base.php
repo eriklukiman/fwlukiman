@@ -31,7 +31,7 @@ class Base {
 	public static function load($name) {
 		if (empty($name)) return new self();
 		// var_dump($name);
-		$class = self::$_prefixClass . $name;
+		$class = self::getPrefix() . $name;
 		self::Include_File($name);
 		$class = '\\Lukiman\\' . $class; 
 		// if (!self::exists($name)) exit('Error class ' . $name . ' not found');//return false; //error
@@ -42,7 +42,7 @@ class Base {
 	public static function exists ($name) {
 		self::Include_File($name);
 		// echo '||' . self::$_prefixClass . $name;
-		return class_exists('\\Lukiman\\' . self::$_prefixClass . $name);
+		return class_exists('\\Lukiman\\' . self::getPrefix() . $name);
 	}
 	
 	public static function getPrefix() {
