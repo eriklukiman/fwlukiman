@@ -10,16 +10,11 @@ class Base {
 	protected $result = '';
 	protected $headers = [];
     
-    /*** @var Request */
     protected $request ;
     
-    public static $_action ;
-    
-    protected $action ;
+    protected static $action ;
     
     public function __construct () {
-//        $this->catchRequestParams();
-        $this->action       = self::$_action;
     }
     
     private static function Include_File($name) {
@@ -124,7 +119,7 @@ class Base {
 	}
     
     public static function set_action($action = '') {
-        self::$_action      = $action;
+        self::$action      = $action;
     }
     
 	public function do_AvailableFunctions() {
