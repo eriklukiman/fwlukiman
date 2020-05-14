@@ -17,35 +17,36 @@ class Base {
     public function __construct () {
     }
     
-    private static function Include_File($name) {
-		$f = self::getPath() . $name . '.php';
+    private static function Include_File($name, $pathPrefix = '') {
+		$f = self::getPath($pathPrefix) . $name . '.php';
+		$f = str_replace('\\', '/', $f);
 		if (!is_readable($f)) $f = str_replace('_', '/', $f);
 		if (is_readable($f)) include_once($f);
 	}
 	
-	public static function load($name) {
+	public static function load($name, $prefix = '') {
 		if (empty($name)) return new self();
-		// var_dump($name);
-		$class = self::getPrefix() . $name;
-		self::Include_File($name);
+
+		$class = self::getPrefix($prefix) . $name;
+		self::Include_File($name, $prefix);
 		$class = '\\Lukiman\\' . $class; 
-		// if (!self::exists($name)) exit('Error class ' . $name . ' not found');//return false; //error
-		// echo ':'.$class.':';
+
 		return new $class;
 	}
 	
-	public static function exists ($name) {
-		self::Include_File($name);
-		// echo '||' . self::$_prefixClass . $name;
-		return class_exists('\\Lukiman\\' . self::getPrefix() . $name);
+	public static function exists ($name, $prefix = '') {
+		self::Include_File($name, $prefix);
+		return class_exists('\\Lukiman\\' . self::getPrefix($prefix) . $name);
 	}
 	
-	public static function getPrefix() {
-		return self::$_prefixClass;
+	public static function getPrefix($usedPrefix = '') {
+		if (!empty($usedPrefix)) return $usedPrefix . (substr($usedPrefix,-1) == '\\' ? '' : '\\');
+		else return self::$_prefixClass;
 	}
 	
-	public static function getPath() {
-		return self::$_path;
+	public static function getPath($usedPathPrefix = '') {
+		if (!empty($usedPathPrefix)) return '';
+		else return self::$_path;
 	}
 	
 	public function execute ($action = 'Index', array $params = null, Request $request = null) {
