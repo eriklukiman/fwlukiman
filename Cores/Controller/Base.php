@@ -7,7 +7,6 @@ use \Lukiman\Cores\Exception\Base as ExceptionBase;
 class Base {
 	protected static $_path = 'Modules/';
 	protected static $_prefixClass = 'Modules\\';
-	protected static $_nameSpacePrefix = 'Lukiman';
 	protected $result = '';
 	protected $headers = [];
     
@@ -30,22 +29,14 @@ class Base {
 
 		$class = self::getPrefix($prefix) . $name;
 		self::Include_File($name, $prefix);
-		$class = '\\' . self::getNameSpacePrefix() . '\\' . $class; 
+		$class = '\\' . LUKIMAN_NAMESPACE_PREFIX . '\\' . $class; 
 
 		return new $class;
 	}
 	
 	public static function exists ($name, $prefix = '') {
 		self::Include_File($name, $prefix);
-		return class_exists('\\' . self::getNameSpacePrefix() . '\\' . self::getPrefix($prefix) . $name);
-	}
-	
-	public static function setNameSpacePrefix($name) {
-		self::$_nameSpacePrefix = $name;
-	}
-	
-	public static function getNameSpacePrefix() {
-		return self::$_nameSpacePrefix;
+		return class_exists('\\' . LUKIMAN_NAMESPACE_PREFIX . '\\' . self::getPrefix($prefix) . $name);
 	}
 	
 	public static function getPrefix($usedPrefix = '') {

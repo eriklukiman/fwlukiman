@@ -7,7 +7,7 @@ use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class Model {
 	protected static $_path = 'Models/';
-	protected static $_prefixClass = '\\Lukiman\\Models\\';
+	protected static $_prefixClass = '\\' . LUKIMAN_NAMESPACE_PREFIX . '\\Models\\';
 	protected $_table = null;
 	protected $_prefix = null;
 	protected $_db = null;
