@@ -6,7 +6,7 @@ use Assert\AssertionFailedException;
 
 use \Lukiman\Cores\Authentication as mAuthentication;
 
-class Authentication extends General {
+class Authentication extends Base {
 	
 	public function do_SimpleAuth() {
 		// $config = ['provider' => 'google'];

@@ -4,7 +4,7 @@ namespace Lukiman\Test;
 use \Lukiman\Cores\Controller;
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
-abstract class General extends Controller\Json {
+abstract class Base extends Controller\Json {
 	
 	public function do_Index($param) {
 		throw new ExceptionBase('No Action defined!');

@@ -6,7 +6,7 @@ use Assert\AssertionFailedException;
 
 use \Lukiman\Cores\Cache as mCache;
 
-class Cache extends General {
+class Cache extends Base {
 	public function do_SimpleGet() {
 		$cache = mCache::getInstance();
 		$key = 'def';

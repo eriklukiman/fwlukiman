@@ -7,7 +7,7 @@ use Assert\AssertionFailedException;
 use \Lukiman\Cores\Authorization\Role;
 use \Lukiman\Cores\Authorization\Permission;
 
-class Authorization extends General {
+class Authorization extends Base {
 	
 	public function do_SimpleAuth() {
 		echo '<pre>';
