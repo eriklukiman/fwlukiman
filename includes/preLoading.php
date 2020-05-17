@@ -1,27 +1,24 @@
 <?php
-// require_once('vendor/autoload.php');
-// echo '<pre>';
 
 function loadClass($className) {
-	$prefix = 'Cores';
-	$NsPrefix = 'Lukiman';
+	$NsPrefix = LUKIMAN_NAMESPACE_PREFIX;
 	$fileName = '';
 	$namespace = '';
 
 	// Sets the include path as the "src" directory
-	$includePath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR;//.'src';
-	// echo "\n";var_dump($className);
+	$includePath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR;
+
 	//remove namespace prefix
 	if (!empty($NsPrefix)) $className = substr($className, strlen($NsPrefix) + 1);
-	// echo $includePath . '==';
+
 	if (false !== ($lastNsPos = strripos($className, '\\'))) {
-		$namespace = substr($className, 0, $lastNsPos);//echo $className;
+		$namespace = substr($className, 0, $lastNsPos);
 		$className = substr($className, $lastNsPos + 1);
 		$fileName = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
 	}
 	$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 	$fullFileName = $includePath . DIRECTORY_SEPARATOR . $fileName;
-   // echo "\n";var_dump($fileName);
+
 	if (is_readable($fullFileName)) {
 		require_once $fullFileName;
 	} else {
