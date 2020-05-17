@@ -24,8 +24,12 @@ class Model {
 		return self::$_path;
 	}
 	
-	public static function getPrefix() {
+	public static function getPrefixClass() {
 		return self::$_prefixClass;
+	}
+	
+	public function getPrefix() {
+		return $this->_prefix;
 	}
 	
 	public static function load($name) {
@@ -57,7 +61,7 @@ class Model {
 		$db->releaseConnection();
 		return $data;
 	}
-
+	
 	public function getServerTimestamp() {
 		$q = $this->query('SELECT NOW() AS time ');
 		$this->releaseConnection();
