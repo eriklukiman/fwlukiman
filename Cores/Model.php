@@ -11,6 +11,7 @@ class Model {
 	protected $_table = null;
 	protected $_prefix = null;
 	protected $_db = null;
+	protected array $fields = [];
 	
 	public function __construct() {
 		// $this->_db = Database::getInstance();
@@ -47,6 +48,19 @@ class Model {
 		} else {
 			throw new ExceptionBase('Model not found!');
 		}
+	}
+	
+	public function getFieldsDetail() : array {
+		if (!empty($this->fields)) return $this->fields;
+		$prefix = $this->getPrefix();
+		$db = Database::getInstance();
+		$q = $db->query("DESCRIBE " . $this->getTable());
+		$result = [];
+		foreach ($q as $v) {
+			$v = (array) $v;
+			$result[$v['Field']] = $v;
+		}
+		return $result;
 	}
 	
 	public function getData ($id, array $cols = null) {
