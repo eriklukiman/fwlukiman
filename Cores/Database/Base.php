@@ -70,7 +70,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $insertId) return $insertId;
-		else return $commit;
+		else return false;
 	}
 	
 	public static function Update (Database $db, $table = '', $arrValues = array(), $where = '1', $bindVars = array(), $join = '') : int {
@@ -125,7 +125,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $affectedRows) return $affectedRows;
-		else return $commit;
+		else return false;
 	}
 	
 	public static function Delete (Database $db, $table = '', $where = '', $bindVars = array(), $limit = '') : int {
@@ -161,7 +161,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $affectedRows) return $affectedRows;
-		else return $commit;
+		else return false;
 	}
 	
 	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having, $limit = '', $isGrid = false) /*: /*Object*/ {
