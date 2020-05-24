@@ -8,29 +8,39 @@ use \Lukiman\Cores\Exception\Base as ExceptionBase;
 class Model {
 	protected static $_path = 'Models/';
 	protected static $_prefixClass = '\\' . LUKIMAN_NAMESPACE_PREFIX . '\\Models\\';
-	protected $_table = null;
-	protected $_prefix = null;
-	protected $_db = null;
+	protected String $table;
+	protected String $prefix;
+	protected String $primaryKey;
+	protected Database $db;
 	protected array $fields = [];
 	
 	public function __construct() {
-		// $this->_db = Database::getInstance();
+		$this->db = Database::getInstance();
 	}
 	
-	public function getTable() {
-		return $this->_table;
+	public function getTable() : String {
+		return $this->table;
 	}
 	
-	public static function getPath() {
+	public function getDb() : Database {
+		if (is_null($this->db)) $this->db = Database::getInstance();
+		return $this->db;
+	}
+	
+	public static function getPath() : String {
 		return self::$_path;
 	}
 	
-	public static function getPrefixClass() {
+	public static function getPrefixClass() : String {
 		return self::$_prefixClass;
 	}
 	
-	public function getPrefix() {
-		return $this->_prefix;
+	public function getPrefix() : String {
+		return $this->prefix;
+	}
+	
+	public function getPrimaryKey() : String {
+		return $this->primaryKey;
 	}
 	
 	public static function load($name) {
@@ -40,9 +50,7 @@ class Model {
 		$f = self::getPath() . $name . '.php';
 		if (!is_readable($f)) $f = str_replace('_', '/', $f);
 		if (is_readable($f)) include_once($f);
-		// var_dump($class);
-		// $class = '\Lukiman\\' . $class; 
-		// echo ':'.$class.':';
+
 		if (class_exists($class)) {
 			return new $class;
 		} else {
@@ -64,16 +72,40 @@ class Model {
 	}
 	
 	public function getData ($id, array $cols = null) {
-		if (is_null($this->_db)) $this->_db = Database::getInstance();
-		$q = Database_Query::Select($this->_db, $this->_table);//var_dump($q);
+		$q = Database_Query::Select($this->getDb(), $this->getTable());
 		if (is_array($id)) $q->where($id);
-		else $q->where($this->_prefix . 'Id', $id);
+		else $q->where($this->prefix . 'Id', $id);
 		if (!empty($cols)) $q->columns($cols);
 		
-		// return $q->execute()->next();
 		$data = $q->execute();
-		$db->releaseConnection();
+		$this->getDb()->releaseConnection();
 		return $data;
+	}
+	
+	public function insert(array $data) : int {
+		if (empty($data)) {
+			throw new ExceptionBase('No Data to be added!');
+		}
+
+		return Database_Query::Insert($this->getTable())->data($data)->execute($this->getDb());
+	}
+	
+	public function update(String $id, $data) : int {
+		//remove ID field from being updated
+		if (array_key_exists($this->getPrimaryKey(), $data)) {
+			unset($data[$this->getPrimaryKey()]);
+		}
+
+		if (empty($data)) {
+			throw new ExceptionBase('No Data to be updated!');
+		}
+		
+		$result = Database_Query::Update($this->getTable())->data($data)->where($this->getPrimaryKey(), $id)->execute($this->getDb());
+		return $result;
+	}
+	
+	public function delete(String $id) : int {
+		return Database_Query::Delete($this->getTable())->where($this->getPrimaryKey(), $id)->execute($this->getDb());
 	}
 	
 	public function getServerTimestamp() {

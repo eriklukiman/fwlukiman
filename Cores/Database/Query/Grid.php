@@ -4,16 +4,16 @@ namespace Lukiman\Cores\Database\Query;
 use \Lukiman\Cores\{Database, Request};
 
 class Grid extends Select {
-	protected $request;
-	protected $_rows;
-	protected $_totalRows;
-	protected $_page;
-	protected $_totalPage;
-	protected $_rowsPerPage;
-	protected $_defaultPage = 1;
-	protected $_defaultRowsPerPage = 20;
-	protected $_pageName = 'page';
-	protected $_rowsPerPageName = 'max';
+	protected Request $request;
+	protected ?int $_rows = null;
+	protected ?int $_totalRows = null;
+	protected ?int $_page = null;
+	protected ?int $_totalPage = null;
+	protected ?int $_rowsPerPage = null;
+	protected int $_defaultPage = 1;
+	protected int $_defaultRowsPerPage = 20;
+	protected String $_pageName = 'page';
+	protected String $_rowsPerPageName = 'max';
 	
 	public function __construct ($table = '', Database $db = null) {
 		parent::__construct($table, $db);
@@ -75,17 +75,18 @@ class Grid extends Select {
 			if(empty($this->_rows) AND isset($this->_dbStatement->result_set)) $this->_rows = count($this->_dbStatement->result_set);
 			$this->_totalRows = $rs1->fetchColumn() + 0;
 			$this->_totalPage = ceil($this->_totalRows / $this->_rowsPerPage);
+			if (empty($this->_totalRows) AND empty($this->_totalPage)) $this->_totalPage = 1;
 		}
 		return $this;
 	}
 	
 	public function getRows() {
-		if (empty($this->_totalRows)) $this->countData();
+		if (is_null($this->_totalRows)) $this->countData();
 		return $this->_rows;
 	}
 	
 	public function getTotalRows() {
-		if (empty($this->_totalRows)) $this->countData();
+		if (is_null($this->_totalRows)) $this->countData();
 		return $this->_totalRows;
 	}
 	
@@ -94,12 +95,12 @@ class Grid extends Select {
 	}
 	
 	public function getPage() {
-		if (empty($this->_totalPage)) $this->countData();
+		if (is_null($this->_totalPage)) $this->countData();
 		return $this->_page;
 	}
 	
 	public function getTotalPage() {
-		if (empty($this->_totalPage)) $this->countData();
+		if (is_null($this->_totalPage)) $this->countData();
 		return $this->_totalPage;
 	}
 	
