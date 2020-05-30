@@ -63,6 +63,9 @@ class Model {
 		$prefix = $this->getPrefix();
 		$db = Database::getInstance();
 		$q = $db->query("DESCRIBE " . $this->getTable());
+		if (empty($q)) {
+			throw new ExceptionBase('Table ' . $this->getTable() . ' is not exist!');
+		}
 		$result = [];
 		foreach ($q as $v) {
 			$v = (array) $v;
