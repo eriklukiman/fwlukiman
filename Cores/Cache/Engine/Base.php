@@ -10,4 +10,6 @@ abstract class Base implements ICache {
 	abstract public function get(String $id);
 	
 	abstract public function set(String $id, $value, ?int $ttl);
+	
+	abstract public function delete(String $id);
 }

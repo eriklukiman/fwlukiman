@@ -5,4 +5,6 @@ interface Cache {
 	public function set(String $id, $value, ?int $ttl);
 	
 	public function get(String $id);
+	
+	public function delete(String $id);
 }

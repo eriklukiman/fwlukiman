@@ -22,4 +22,8 @@ class Memcache extends Base implements ICache {
 	public function set(String $id, $value, ?int $ttl = 0) {
 		return $this->cache->set($id, $value, false, $ttl);
 	}
+	
+	public function delete(String $id) {
+		return $this->cache->delete($id);
+	}
 }

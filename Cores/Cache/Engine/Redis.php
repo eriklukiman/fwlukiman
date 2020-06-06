@@ -23,4 +23,8 @@ class Redis extends Base implements ICache {
 	public function set(String $id, $value, ?int $ttl = null) {
 		return $this->cache->set($id, $value, $ttl);
 	}
+	
+	public function delete(String $id) {
+		return $this->cache->del($id);
+	}
 }

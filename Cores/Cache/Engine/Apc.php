@@ -20,4 +20,7 @@ class Apc extends Base implements ICache {
 		return apc_store($id, $value, $ttl);
 	}
 
-}
+	public function delete(String $id) {
+		return apc_delete($id);
+	}
+}}
