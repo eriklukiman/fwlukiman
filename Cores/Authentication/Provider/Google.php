@@ -40,7 +40,8 @@ class Google extends Base implements IAuthentication {
 	protected function convertToData(?array $input) : AuthData {
 		$authData = new AuthData();
 		if (!empty($input) AND !empty($input['email_verified']) AND ($input['email_verified'] == 'true') AND !empty($input['aud']) AND ($input['aud'] == $this->applicationID) AND ($input['exp'] > time())) {
-			$authData->setUserName($input['sub'] . '@' . $input['iss']);
+			// $authData->setUserName($input['sub'] . '@' . $input['iss']);
+			$authData->setUserName($input['email']);
 			$authData->setEmail($input['email']);
 			$authData->setName($input['name']);
 			$authData->setPicture($input['picture']);
