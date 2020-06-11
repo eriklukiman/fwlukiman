@@ -75,12 +75,12 @@ class Model {
 	}
 	
 	public function getData ($id, array $cols = null) {
-		$q = Database_Query::Select($this->getDb(), $this->getTable());
+		$q = Database_Query::Select($this->getTable());
 		if (is_array($id)) $q->where($id);
 		else $q->where($this->prefix . 'Id', $id);
 		if (!empty($cols)) $q->columns($cols);
 		
-		$data = $q->execute();
+		$data = $q->execute($this->getDb());
 		$this->getDb()->releaseConnection();
 		return $data;
 	}
