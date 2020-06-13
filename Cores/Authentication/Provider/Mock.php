@@ -14,6 +14,10 @@ class Mock extends Base implements IAuthentication {
 		$this->credentials = $authData;
 	}
 	
+	public function authWithUserPassword(String $username, String $password) : bool {
+		return true;
+	}
+
 	public function authWithToken(String $token) : bool {
 		return true;
 	}
