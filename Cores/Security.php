@@ -1,14 +1,11 @@
 <?php
 namespace Lukiman\Cores;
 
-use \Lukiman\Cores\Model;
 use \Lukiman\Cores\Request;
 use \Lukiman\Cores\Authentication;
 use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Session;
 use \Lukiman\Cores\Authorization\Role;
-use \Lukiman\Cores\Authorization\Permission;
-use \Lukiman\Cores\Database\Query as Database_Query;
 
 class Security {
 	public static function login(String $token) : array {
