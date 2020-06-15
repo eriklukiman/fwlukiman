@@ -2,6 +2,7 @@
 namespace Lukiman\Cores\Authorization;
 
 use \Lukiman\Cores\Data\Authorization\Permission as PermissionData;
+use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class Permission {
 	private PermissionData $permission;
@@ -72,7 +73,7 @@ class Permission {
 		if ($prefix === $this->prefix) {
 			return $this->isAuthorized($operation);
 		} else {
-			parent::__call($_name, $_arguments);
+			throw new ExceptionBase("No method with name " . $_name);
 		}
 	
 	}

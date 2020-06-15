@@ -2,8 +2,8 @@
 namespace Lukiman\Cores\Authorization;
 
 use \Lukiman\Cores\Authorization\Permission;
-// use \Lukiman\Cores\Data\Authorization\Permission as PermissionData;
 use \Lukiman\Cores\Data\Authorization\Role as RoleData;
+use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class Role {
 	private RoleData $role;
@@ -96,7 +96,7 @@ class Role {
 		if ($prefix === $key) {
 			return $this->getModule($module);
 		} else {
-			parent::__call($_name, $_arguments);
+			throw new ExceptionBase("No method with name " . $_name);
 		}
 	
 	}
