@@ -28,7 +28,12 @@ class Security {
 			$cache = Cache::getInstance();
 			$cacheKey = $sessionId;
 
-			$cache->set($cacheKey, ['credential' => $cred, 'authorization' => $roles], SESSION_LENGTH);
+			$entry = ['credential' => $cred, 'authorization' => $roles];
+			
+			$additionalInfos = static::getAdditionalInfos($cred->getUserName());
+			if (!empty($additionalInfos)) $entry += $additionalInfos;
+
+			$cache->set($cacheKey, $entry, SESSION_LENGTH);
 
 			return [
 				'status'	=> true,
@@ -90,5 +95,9 @@ class Security {
 
 	protected static function getAuthorizations(String $userId) : Role {
 		return new Role('Base');
+	}
+
+	protected static function getAdditionalInfos(String $userId) : array {
+		return [];
 	}
 }
