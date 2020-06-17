@@ -161,7 +161,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
 		if ($commit AND $affectedRows) return $affectedRows;
-		else return false;
+		else return 0;
 	}
 	
 	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having, $limit = '', $isGrid = false) /*: /*Object*/ {

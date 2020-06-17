@@ -93,7 +93,7 @@ class Model {
 		return Database_Query::Insert($this->getTable())->data($data)->execute($this->getDb());
 	}
 	
-	public function update(String $id, $data) : int {
+	public function update(String $id, $data, array $optWhere = []) : int {
 		//remove ID field from being updated
 		if (array_key_exists($this->getPrimaryKey(), $data)) {
 			unset($data[$this->getPrimaryKey()]);
@@ -103,12 +103,24 @@ class Model {
 			throw new ExceptionBase('No Data to be updated!');
 		}
 		
-		$result = Database_Query::Update($this->getTable())->data($data)->where($this->getPrimaryKey(), $id)->execute($this->getDb());
+		$q = Database_Query::Update($this->getTable())->data($data)->where($this->getPrimaryKey(), $id);
+		if (!empty($optWhere)) {
+			foreach ($optWhere as $field => $value) {
+				$q->where($field, $value);
+			}
+		}
+		$result = $q->execute($this->getDb());
 		return $result;
 	}
 	
-	public function delete(String $id) : int {
-		return Database_Query::Delete($this->getTable())->where($this->getPrimaryKey(), $id)->execute($this->getDb());
+	public function delete(String $id, array $optWhere = []) : int {
+		$q = Database_Query::Delete($this->getTable())->where($this->getPrimaryKey(), $id);
+		if (!empty($optWhere)) {
+			foreach ($optWhere as $field => $value) {
+				$q->where($field, $value);
+			}
+		}
+		return $q->execute($this->getDb());
 	}
 	
 	public function getServerTimestamp() {
