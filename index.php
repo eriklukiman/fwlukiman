@@ -23,7 +23,11 @@ if (!empty($fullPath)) {
 	if (end($path) == '') array_pop($path);
 	
 	$_path = $path;
-	foreach ($path as $k => $v) $path[$k] = ucwords(strtolower($v));
+	foreach ($path as $k => $v) {
+		$path[$k] = preg_replace_callback('/(\_[a-z])/', function ($word) {
+			return strtoupper($word[1]);
+		}, ucwords(strtolower($v)));
+	}
 	$class = implode('\\', $path);
 	
 	$retVal = null;
