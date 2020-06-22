@@ -70,10 +70,14 @@ class Security {
 		$sessionId = '';
 		$headers = $request->getHeaders();
 		if (!empty($headers['Cookie'])) {
-			foreach($headers['Cookie'] as $cookie) {
-				if (substr($cookie, 0, strlen(COOKIE_NAME) + 1) == (COOKIE_NAME . '=')) {
-					$sessionId = substr($cookie, strlen(COOKIE_NAME) + 1);
-					break;
+			foreach($headers['Cookie'] as $cookies) {
+				$cookie = explode(";", $cookies);
+				foreach($cookie as $curCookie) {
+					$curCookie = trim($curCookie);
+					if (substr($curCookie, 0, strlen(COOKIE_NAME) + 1) == (COOKIE_NAME . '=')) {
+						$sessionId = substr($curCookie, strlen(COOKIE_NAME) + 1);
+						break;
+					}
 				}
 			}
 		}
