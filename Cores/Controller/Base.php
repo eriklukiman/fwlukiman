@@ -63,7 +63,11 @@ class Base {
         
 		$this->beforeExecute();
 		$retVal = null;
-		
+
+		if (strcasecmp($this->request->getmethod(), 'options') == 0) {
+			return static::optionsHandler($params);
+		}
+
 		if(method_exists($this, $doAction)) $retVal = $this->{$doAction}($params) ;
 		else {
 			// if (!headers_sent()) header('HTTP/1.0 404 Not Found');
@@ -130,7 +134,7 @@ class Base {
 			if ($v == __FUNCTION__) continue;
 			if (substr($v, 0, 3) == 'do_') $result[] = substr($v, 3);
 		}
-		return $result;
+		return ['actions' => $result];
 	}
 
 	protected function parseValue ($template, $value) {
@@ -139,6 +143,11 @@ class Base {
 		}
 
         return $template;
+    }
+
+    protected function optionsHandler(array $param) {
+    	$this->addHeaders(['Access-Control-Allow-Methods' => 'POST, GET, OPTIONS, DELETE, PUT, PATCH']);
+    	return ;
     }
 
 }
