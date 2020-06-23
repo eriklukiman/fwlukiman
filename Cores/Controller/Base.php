@@ -57,16 +57,15 @@ class Base {
 			if ($action != 'Index') array_unshift($params, $action);
 			$doAction = 'do_Index';
 		}
-		// print_r($request);
-		// print_r($params);
+
         $this->catchRequestParams($params, $request);
         
-		$this->beforeExecute();
-		$retVal = null;
-
 		if (strcasecmp($this->request->getmethod(), 'options') == 0) {
 			return static::optionsHandler($params);
 		}
+
+		$this->beforeExecute();
+		$retVal = null;
 
 		if(method_exists($this, $doAction)) $retVal = $this->{$doAction}($params) ;
 		else {
