@@ -48,7 +48,8 @@ class Model {
 		$class = self::$_prefixClass . $name;
 		
 		$f = self::getPath() . $name . '.php';
-		if (!is_readable($f)) $f = str_replace('\\', '/', $f);
+		$f = str_replace('\\', '/', $f);
+		if (!is_readable($f)) $f = str_replace('_', '/', $f);
 		if (is_readable($f)) include_once($f);
 
 		if (class_exists($class)) {
