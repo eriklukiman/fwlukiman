@@ -48,13 +48,13 @@ class Model {
 		$class = self::$_prefixClass . $name;
 		
 		$f = self::getPath() . $name . '.php';
-		if (!is_readable($f)) $f = str_replace('_', '/', $f);
+		if (!is_readable($f)) $f = str_replace('\\', '/', $f);
 		if (is_readable($f)) include_once($f);
 
 		if (class_exists($class)) {
 			return new $class;
 		} else {
-			throw new ExceptionBase('Model not found!');
+			throw new ExceptionBase("Model '$class' not found!");
 		}
 	}
 	
