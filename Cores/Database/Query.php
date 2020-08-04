@@ -42,7 +42,7 @@ class Query {
 	}
 	
 	public function setDb(Database $db) {
-		$db = $this->getValidDb($db);
+		$this->_db = $this->getValidDb($db);
 	}
 	
 	public function getBindedVars() {
