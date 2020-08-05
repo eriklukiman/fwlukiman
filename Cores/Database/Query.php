@@ -78,9 +78,23 @@ class Query {
 	
 	public function where($where, $value = null, $operator = '=') {
 		if ((trim($operator) == 'IN') OR (trim($operator) == 'NOT IN')) {
-			$_var = Database::generateRandomVariable();
-			$this->_bindVars[$_var] = $value;
-			$where .= ' ' . $operator . ' ' . $_var;
+			if (!empty($value)) {
+				if (is_array($value)) {
+					$_inVar = [];
+					foreach ($value as $kIn => $vIn) {
+						$_var = Database::generateRandomVariable();
+						$_inVar[] = $_var;
+						$this->_bindVars[$_var] = $vIn;
+					}
+					$where .= ' ' . $operator . ' ( ' . implode(', ', $_inVar) . ' ) ';
+				} else {
+					$_var = Database::generateRandomVariable();
+					$this->_bindVars[$_var] = $value;
+					$where .= ' ' . $operator . ' ( ' . $_var . ' ) ';
+				}
+			} else {
+				$where .= ' = "" ';
+			}
 		} else if ($value !== null) {
 			$_var = Database::generateRandomVariable();
 			$this->_bindVars[$_var] = $value;
