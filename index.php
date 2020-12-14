@@ -9,7 +9,7 @@ use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 	echo 'abc';
-    throw new ExceptionBase($errstr);
+    throw new ExceptionBase($errstr . ' in ' . $errfile . ':' . $errline);
 }
 set_error_handler("exception_error_handler", E_ALL);
 
