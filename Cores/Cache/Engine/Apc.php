@@ -1,5 +1,5 @@
 <?php
-namespace Lukiman\Cores\Cache\Base;
+namespace Lukiman\Cores\Cache\Engine;
 
 use \Lukiman\Cores\Interfaces\Cache as ICache;
 
@@ -23,4 +23,4 @@ class Apc extends Base implements ICache {
 	public function delete(String $id) {
 		return apc_delete($id);
 	}
-}}
+}
