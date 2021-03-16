@@ -1,8 +1,8 @@
 <?php
 // Begin the PHP session so we have a place to store the username
 session_start();
-$client_id = '0oabs1kwlw2mHzS4Z5d6';
-$client_secret = 'vhubwbVFCbE0_u42vJZPURty_2ISh1ksLMt26KBT';
+$client_id = '';
+$client_secret = '';
 $redirect_uri = 'http://localhost/okta/';
 $metadata_url = 'https://dev-46870409.okta.com/oauth2/default/.well-known/oauth-authorization-server';
 
