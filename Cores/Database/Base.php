@@ -164,7 +164,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		else return 0;
 	}
 	
-	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having, $limit = '', $isGrid = false) /*: /*Object*/ {
+	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having = '', $limit = '', $isGrid = false) /*: /*Object*/ {
 		$arrData = array();
 
 		if (!empty($arrColumn) AND is_array($arrColumn)) {
