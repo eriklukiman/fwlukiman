@@ -33,7 +33,7 @@ class Request {
 			$this->get = $this->request->getQueryParams();
 			$this->files = $this->request->getUploadedFiles();
 			$this->body = $this->request->getBody()->getContents();
-			if (empty($this->body)) $this->body = key($this->post);
+			if (empty($this->body) AND !empty($this->post)) $this->body = key($this->post);
     }
     
 	public function getRequest() {
