@@ -14,7 +14,7 @@
         }
     },
     "require": {
-        "nyholm/psr7-server": "^0.3.0",
+        "nyholm/psr7-server": "^1.0",
         "nyholm/psr7": "^1.2",
         "swlib/swpdo": "dev-master",
         "ilexn/swoole-convent-psr7": "dev-master",
