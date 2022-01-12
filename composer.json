@@ -17,7 +17,7 @@
         "nyholm/psr7-server": "^1.0",
         "nyholm/psr7": "^1.2",
         "swlib/swpdo": "dev-master",
-        "ilexn/swoole-convent-psr7": "dev-master",
-        "beberlei/assert": "^3.2"
+        "beberlei/assert": "^3.2",
+        "ilexn/swoole-convert-psr7": "^0.3.0"
     }
 }
