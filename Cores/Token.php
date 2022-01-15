@@ -40,7 +40,8 @@ class Token {
         $now = static::generate();
         $valid_length = strlen($now);
         if (strlen($token) != $valid_length) return false;
-        return (intval($token) > ($now - static::$instance->timeout));
+        $diff = $now - intval($token);
+        return (($diff >= 0) AND ($diff <= static::$instance->timeout));
     }
 
     public static function generate() : String {
