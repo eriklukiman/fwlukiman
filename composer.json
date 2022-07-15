@@ -18,6 +18,7 @@
         "nyholm/psr7": "^1.2",
         "swlib/swpdo": "dev-master",
         "beberlei/assert": "^3.2",
-        "ilexn/swoole-convert-psr7": "^0.3.0"
+        "ilexn/swoole-convert-psr7": "^0.3.0",
+        "spatie/array-to-xml": "^3.1"
     }
 }
