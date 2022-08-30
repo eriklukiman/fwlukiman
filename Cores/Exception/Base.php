@@ -4,7 +4,7 @@ namespace Lukiman\Cores\Exception;
 class Base extends \Exception {
 	protected static $errorCount = 0;
 	
-	public function __construct($message, $code = null, $severity = null, $filename = null, $lineno = null) {
+	public function __construct($message, $code = 0, $severity = null, $filename = null, $lineno = null) {
 		parent::__construct($message, $code);
 		static::logException();
 	}
