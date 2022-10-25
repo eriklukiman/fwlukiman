@@ -110,21 +110,26 @@ class Swoole /*extends \Swoole\Coroutine\MySQL*/  implements Basic, Transaction 
 		return $this->_inTransaction;
 	}
 	
-	public function beginTransaction  () : void {
+	public function beginTransaction  () : bool {
 		try {
             $this->db->beginTransaction();
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+			return false;
+		}
 		$this->_inTransaction = true;
+		return true;
 	}
 	
-	public function commit ($timeout = null) : void {
+	public function commit ($timeout = null) : bool {
 		$this->db->commit();
 		$this->_inTransaction = false;
+		return true;
 	}
 	
-	public function rollBack ($timeout = null) : void {
+	public function rollBack ($timeout = null) : bool {
 		$this->db->rollBack();
 		$this->_inTransaction = false;
+		return true;
 	}
 	
 	public function lastInsertId ($timeout = null) : int {

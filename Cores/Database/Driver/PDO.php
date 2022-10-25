@@ -53,21 +53,26 @@ class PDO extends \PDO implements Basic, Transaction {
 		return $this->_inTransaction;
 	}
 	
-	public function beginTransaction  () : void {
+	public function beginTransaction  () : bool {
 		try {
             parent::beginTransaction ();
-        } catch (\PDOException $e) {}
+        } catch (\PDOException $e) {
+			return false;
+		}
 		$this->_inTransaction = true;
+		return true;
 	}
 	
-	public function commit ($timeout = null) : void {
+	public function commit ($timeout = null) : bool {
 		parent::commit();
 		$this->_inTransaction = false;
+		return true;
 	}
 	
-	public function rollBack ($timeout = null) : void {
+	public function rollBack ($timeout = null) : bool {
 		parent::rollBack();
 		$this->_inTransaction = false;
+		return true;
 	}
 	
 	public function releaseConnection() {
