@@ -13,7 +13,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		$param = func_get_args();
 		if (empty($param) AND !empty(self::$_instance)) return self::$_instance;
 		
-		call_user_func_array(array('parent', '__construct'), $param);
+		call_user_func_array(array(parent::class, '__construct'), $param);
 		return $this;
 	}
 	
