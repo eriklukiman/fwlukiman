@@ -69,6 +69,9 @@ class Security {
 	protected static function getSessionId(Request $request) : String {
 		$sessionId = '';
 		$headers = $request->getHeaders();
+		if (empty($headers['Cookie'])) {
+			$headers['Cookie'] = $request->getSimpleCookies();
+		}
 		if (!empty($headers['Cookie'])) {
 			foreach($headers['Cookie'] as $cookies) {
 				$cookie = explode(";", $cookies);

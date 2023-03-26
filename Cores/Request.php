@@ -45,6 +45,25 @@ class Request {
 		else return $this->request->getHeader($key);
 	}
 	
+	public function getCookies() {
+		return $this->request->getCookieParams();
+	}
+	
+	public function getSimpleCookies() {
+		$cookies = $this->request->getCookieParams();
+        $ret = [];
+        foreach($cookies as $k => $v) $ret[] = $k . '=' . $v;
+        return $ret;
+	}
+
+	public function getCookiesAsString() {
+		$cookies = $this->request->getCookieParams();
+        $ret = '';
+        foreach($cookies as $k => $v) $ret .= $k . '=' . $v . '; ';
+        if (!empty($ret)) $ret = substr($ret, 0, -2);
+        return $ret;
+	}
+
     /**
      * Function for get data POST
      * @param type $key
@@ -148,7 +167,7 @@ class Request {
      * Get framework route
      * @return string
      */
-    public function route() {
+    /*public function route() {
         $path_info      = $this->uri();
         $action         = strtolower(str_replace('do_', '', $this->action()));
                 
@@ -168,7 +187,8 @@ class Request {
         
         return $route;
     }
-    
+    */
+
     /**
      * Function for get data query string (raw GET)
      * @param type none
