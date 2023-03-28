@@ -40,6 +40,7 @@ class Model {
 	}
 	
 	public function getPrimaryKey() : String {
+		if (empty($this->primaryKey)) $this->primaryKey = $this->prefix . 'Id';
 		return $this->primaryKey;
 	}
 	
