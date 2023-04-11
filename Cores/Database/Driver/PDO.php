@@ -7,7 +7,7 @@ use \Lukiman\Cores\Loader;
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class PDO extends \PDO implements Basic, Transaction {
-	protected static $_instance = array();
+	protected static $_instance;
 	protected static $_lastSetting = 'default';
 	protected static $_databaseSetting = null;
 	protected $_inTransaction = false;
@@ -76,6 +76,16 @@ class PDO extends \PDO implements Basic, Transaction {
 	}
 	
 	public function releaseConnection() {
+	}
+
+	public function close() : bool {
+		/*try {
+			$this->query("KILL CONNECTION_ID()");
+		} catch (\Exception $e) {
+			error_log(__CLASS__ . ' : ' . $e->getMessage() . ' => ' . print_r($e, true));
+		}*/
+		static::$_instance = null;
+		return true;
 	}
 	
 	public static function getStats() {
