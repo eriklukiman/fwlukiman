@@ -5,7 +5,7 @@ class Base {
 	
 	public function __construct() {
 		$this->initialize($this);
-		echo 'bbb';
+		//echo 'bbb';
 		// print_r(get_class_vars(get_class($this)));
 		// print_r(get_object_vars($this));
 	}

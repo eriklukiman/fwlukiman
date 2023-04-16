@@ -5,7 +5,7 @@ use \Lukiman\Cores\Exception\Base as ExceptionBase;
 use \Lukiman\Cores\Interfaces\Cache as ICache;
 
 class Memcache extends Base implements ICache {
-	private $cache;
+	private \Memcache $cache;
 	
 	public function __construct(array $config) {
 		$this->cache = memcache_connect($config['host'], $config['port']);

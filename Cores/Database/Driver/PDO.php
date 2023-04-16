@@ -79,11 +79,11 @@ class PDO extends \PDO implements Basic, Transaction {
 	}
 
 	public function close() : bool {
-		/*try {
+		try {
 			$this->query("KILL CONNECTION_ID()");
-		} catch (\Exception $e) {
-			error_log(__CLASS__ . ' : ' . $e->getMessage() . ' => ' . print_r($e, true));
-		}*/
+		} catch (\PDOException $e) {
+			//error_log(__CLASS__ . ' : ' . $e->getMessage());
+		}
 		static::$_instance = null;
 		return true;
 	}
