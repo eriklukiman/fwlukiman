@@ -50,10 +50,7 @@ if (!empty($fullPath)) {
 	
 		$ctrl = Controller::load($class);
 		$retVal = $ctrl->execute($action, $params);
-		if (!headers_sent()) {
-			$headers = $ctrl->getHeaders();
-			foreach($headers as $k => $v) header($k . ': ' . $v);
-		}
+		$ctrl->sendHeaders();
 		echo $retVal;
 	} catch (ExceptionBase $e) {
 		if (!headers_sent()) header('HTTP/1.0 404 Not Found');

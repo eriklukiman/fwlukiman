@@ -99,6 +99,13 @@ class Base {
 		return $this->headers;
 	}
 	
+	public function sendHeaders() {
+		if (!headers_sent()) {
+			$headers = $this->getHeaders();
+			foreach($headers as $k => $v) header($k . ': ' . $v);
+		}
+	}
+	
 	protected function setHeaders(array $headers) {
 		$this->headers = $headers;
 	}
@@ -106,7 +113,7 @@ class Base {
 	protected function addHeaders(array $headers) {
 		$this->headers = array_merge($this->headers, $headers);
 	}
-	
+
 	protected function beforeExecute () {}
 	
 	protected function afterExecute () {}
