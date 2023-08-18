@@ -79,12 +79,26 @@ class Model {
 	public function getData ($id, array $cols = null) {
 		$q = Database_Query::Select($this->getTable());
 		if (is_array($id)) $q->where($id);
-		else $q->where($this->prefix . 'Id', $id);
+		else $q->where($this->getPrimaryKey(), $id);
 		if (!empty($cols)) $q->columns($cols);
 		
 		$data = $q->execute($this->getDb());
 		$this->getDb()->releaseConnection();
 		return $data;
+	}
+	
+	public function read(String $id, array $optWhere = []) : array | null {
+		$q = Database_Query::Select($this->getTable())->where($this->getPrimaryKey(), $id);
+		if (!empty($optWhere)) {
+			foreach ($optWhere as $field => $value) {
+				$q->where($field, $value);
+			}
+		}
+		return $q->execute($this->getDb())->next('array');
+	}
+
+	public function create(array $data) : int {
+		return $this->insert($data);
 	}
 	
 	public function insert(array $data) : int {

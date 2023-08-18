@@ -33,9 +33,11 @@ class Select extends Database_Query {
 		return $this->_rowCount;
 	}
 	
-	public function next() {
+	public function next($type = 'default') {
 		if (empty($this->_dbStatement)) $this->execute();
-		return $this->_dbStatement->fetch();
+		$row = $this->_dbStatement->fetch();
+		if ($type == 'array') $row = (array) $row;
+		return $row;
 	}
 	
 	public function leftJoin ($join, $on) {
