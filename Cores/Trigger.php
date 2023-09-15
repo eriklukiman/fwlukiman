@@ -36,7 +36,7 @@ class Trigger implements Interfaces\Trigger {
         $this->fire('DELETE', $url, $params);
     }
 
-    protected function fire($method, $url, $params) : void {
+    protected function fire(String $method, String $url, String|array $params = '') : void {
         $this->setUrl($url);
         $this->setMethod($method);
         $this->setBody($params);
@@ -49,6 +49,7 @@ class Trigger implements Interfaces\Trigger {
         $scheme = $newUrl['scheme'] === 'https' ? 'ssl://' : '';
         $host   = $scheme . $newUrl['host'];
 
+        //$socket = stream_socket_client($host, $errno, $errstr, $this->connectionTimeout);
         $socket = fsockopen($host, $newUrl['port'], $errno, $errstr, $this->connectionTimeout);
         if (! $socket) {
             throw new ExceptionBase($errstr, $errno);
