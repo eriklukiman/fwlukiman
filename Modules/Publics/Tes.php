@@ -12,9 +12,10 @@ use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Authentication;
 use \Lukiman\Cores\Authorization\Role;
 use \Lukiman\Cores\Authorization\Permission;
+use \Lukiman\Cores\Trigger;
 
 class Tes extends General {
-    
+    protected $dataId;    
     protected $mapping     = array();
 	protected $mappingView = array();
     
@@ -120,7 +121,7 @@ class Tes extends General {
 	}
 	
 	public function do_Cache() {
-		$cache = Cache::getInstance();
+		$cache = Cache::getInstance();echo 'bbbb';
 		$key = 'def';
 		$val = $cache->get($key);
 		if (empty($val)) {
@@ -214,5 +215,10 @@ class Tes extends General {
 
 	}
 	
+	public function do_FireForget($param) {
+		$ff = new Trigger();
+		$ff->get('http://localhost/forward/dump.php', ['a' => 'cc', 'b' => 'dd']);
+		//$ff->get('http://localhost/forward/dump.php');
+	}
 	
 }

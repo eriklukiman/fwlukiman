@@ -31,7 +31,7 @@ class Base {
 	
 	public function __construct() {
 		$this->autoSetPort();
-		$this->http = new \swoole_http_server("127.0.0.1", static::$port);
+		$this->http = new \Swoole\Http\Server("127.0.0.1", static::$port);
 		
 		$psr17Factory = new Psr17Factory();
 		$this->serverRequestFactory = new \Ilex\SwoolePsr7\SwooleServerRequestConverter(
@@ -54,7 +54,8 @@ class Base {
 		// Database::populateConnectionPool($dbConfig);
 		
 		$cacheConfig = Loader::Config('Cache');
-		$cacheConfig = array('engine' => 'redis', 'port' => 6379) + $cacheConfig;
+		//$cacheConfig = array('engine' => 'redis', 'port' => 6379) + $cacheConfig;
+		$cacheConfig = array('engine' => 'apcu', 'port' => 6379) + $cacheConfig;
 		Cache::setConfig($cacheConfig);
 		
 		//Exception variables
