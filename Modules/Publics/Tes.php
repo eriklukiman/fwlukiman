@@ -12,9 +12,10 @@ use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Authentication;
 use \Lukiman\Cores\Authorization\Role;
 use \Lukiman\Cores\Authorization\Permission;
+use \Lukiman\Cores\Token;
 
 class Tes extends General {
-    
+    protected $dataId;
     protected $mapping     = array();
 	protected $mappingView = array();
     
@@ -212,6 +213,19 @@ class Tes extends General {
 		print_r($role2);
 		print_r($authL);
 
+	}
+	
+	public function do_Token() {
+		$token = Token::getInstance();
+		$val = '';
+		
+		echo time() . ' = ' . $token::generate();
+		$a = $token::generate();
+		var_dump($token::isValid($a));
+		// var_dump($cache);
+		// var_dump($val);
+		return $val;
+		
 	}
 	
 	
