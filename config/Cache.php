@@ -9,7 +9,7 @@ apc					| -
 */
 
 return array (
-	'engine'	=> 'memcache', //redis, memcache, apc
+	'engine'	=> 'memcache', //redis, memcache, apc , memcached
 	'port'		=> '11211', //redis = 6379; memcache 11211
 	'host'		=> 'localhost',
 	'password'	=> '',
