@@ -66,7 +66,7 @@ class Security {
 		return "OK";
 	}
 	
-	protected static function getSessionId(Request $request) : String {
+	protected static function getSessionId(Request $request, String $authenticationHeader = 'Authentication') : String {
 		$sessionId = '';
 		$headers = $request->getHeaders();
 		if (empty($headers['Cookie'])) {
@@ -83,6 +83,10 @@ class Security {
 					}
 				}
 			}
+		}
+		if (empty($sessionId) AND !empty($request->getRequest()->getHeader($authenticationHeader))) {
+			$sessionId = $request->getRequest()->getHeader($authenticationHeader);
+			if (is_array($sessionId)) $sessionId = $sessionId[0];
 		}
 		return $sessionId;
 	}
