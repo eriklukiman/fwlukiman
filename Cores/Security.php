@@ -87,6 +87,10 @@ class Security {
 		if (empty($sessionId) AND !empty($request->getRequest()->getHeader($authenticationHeader))) {
 			$sessionId = $request->getRequest()->getHeader($authenticationHeader);
 			if (is_array($sessionId)) $sessionId = $sessionId[0];
+			if (strtolower(substr($sessionId, 0, 7)) == 'bearer ') {
+				$sessionId = substr($sessionId, 7);
+				$sessionId = trim($sessionId);
+			}
 		}
 		return $sessionId;
 	}
