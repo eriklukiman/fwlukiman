@@ -3,6 +3,7 @@ namespace Lukiman\Cores\Data;
 
 class Authentication extends Base {
 	private ?String $userName;
+	private ?String $password;
 	private ?String $email;
 	private ?String $name;
 	private ?String $picture;
@@ -24,6 +25,15 @@ class Authentication extends Base {
 
 	public function setUserName(String $userName) {
 		$this->userName = $userName;
+		return $this;
+	}
+
+	public function getPassword() : ?String {
+		return $this->password;
+	}
+
+	public function setPassword(String $password) {
+		$this->password = $password;
 		return $this;
 	}
 

@@ -10,7 +10,11 @@ interface Authentication {
 	
 	public function isAuthenticated() : bool;
 	
+	public function grantAuthentication(AuthData $data) : bool;
+
 	public function revokeAuthentication() : bool;
+
+	public function extendAuthentication(int $ttl) : bool;
 	
 	public function getCredentials() : ?AuthData;
 }

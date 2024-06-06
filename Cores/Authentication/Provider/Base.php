@@ -8,6 +8,9 @@ use \Lukiman\Cores\Data\Authentication as AuthData;
 abstract class Base implements IAuthentication {
 	protected ?AuthData $credentials;
 	
+	public function __construct(?array $config = null) {
+	}
+
 	public function authWithUserPassword(String $username, String $password) : bool {
 		return false;
 	}
@@ -25,9 +28,24 @@ abstract class Base implements IAuthentication {
 		}
 	}
 	
+	public function grantAuthentication(AuthData $data) : bool {
+		$this->credentials = $data;
+		return true;
+	}
+
 	public function revokeAuthentication() : bool {
 		$this->credentials = null;
 		return true;
+	}
+
+	public function extendAuthentication(int $ttl) : bool {
+		if ($this->isAuthenticated()) {
+			$this->credentials->setExpired(strtotime("+" . $ttl . " second"));
+			return true;
+		} else {
+			$this->revokeAuthentication();
+			return false;
+		}
 	}
 	
 	public function getCredentials() : ?AuthData {
