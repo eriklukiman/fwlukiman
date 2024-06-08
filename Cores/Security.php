@@ -6,13 +6,26 @@ use \Lukiman\Cores\Authentication;
 use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Session;
 use \Lukiman\Cores\Authorization\Role;
+use Lukiman\Test\Authorization;
 
 class Security {
-	public static function login(String $token) : array {
+	public static function loginWithToken(String $token) : array {
 		$auth = new Authentication();
-		
 		$auth->authWithToken($token);
-	
+		return static::proceedAuthentication($auth);
+	}
+
+	public static function login(String $token) : array {
+		return static::loginWithToken($token);
+	}
+
+	public static function loginWithUserPassword(String $username, String $password) : array {
+		$auth = new Authentication();
+		$auth->authWithUserPassword($username, $password);
+		return static::proceedAuthentication($auth);
+	}
+
+	public static function proceedAuthentication(Authentication $auth) : array {
 		$cred = $auth->getCredentials();
 		// print_r($cred);
 		$sessionId = Session::generate();

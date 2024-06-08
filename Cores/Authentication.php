@@ -19,7 +19,7 @@ class Authentication implements Interfaces\Authentication {
 	}
 	
 	public function authWithUserPassword(String $username, String $password) : bool {
-		return $this->instance->authWithToken($username, $password);
+		return $this->instance->authWithUserPassword($username, $password);
 	}
 	
 	public function authWithToken(String $token) : bool {

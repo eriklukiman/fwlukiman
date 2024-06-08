@@ -17,7 +17,8 @@ class Tes extends Base {
     protected $mapping     = array();
 	protected $mappingView = array();
     
-    protected $table_name   ;
+    protected $table_name;
+	protected $dataId;
 
     public function beforeExecute () {
         parent::beforeExecute () ;
