@@ -3,10 +3,10 @@ namespace Lukiman\Cores;
 
 use \Lukiman\Cores\Request;
 use \Lukiman\Cores\Authentication;
+use \Lukiman\Cores\Interfaces\Authentication as IAuthentication;
 use \Lukiman\Cores\Cache;
 use \Lukiman\Cores\Session;
 use \Lukiman\Cores\Authorization\Role;
-use Lukiman\Test\Authorization;
 
 class Security {
 	public static function loginWithToken(String $token) : array {
@@ -25,7 +25,7 @@ class Security {
 		return static::proceedAuthentication($auth);
 	}
 
-	public static function proceedAuthentication(Authentication $auth) : array {
+	public static function proceedAuthentication(IAuthentication $auth) : array {
 		$cred = $auth->getCredentials();
 		// print_r($cred);
 		$sessionId = Session::generate();
