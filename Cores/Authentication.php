@@ -37,4 +37,12 @@ class Authentication implements Interfaces\Authentication {
 	public function getCredentials() : ?AuthData {
 		return $this->instance->getCredentials();
 	}
+
+	public function extendAuthentication(int $ttl) : bool {
+		return $this->instance->extendAuthentication($ttl);
+	}
+
+	public function grantAuthentication(AuthData $data) : bool {
+		return $this->instance->grantAuthentication($data);
+	}
 }
