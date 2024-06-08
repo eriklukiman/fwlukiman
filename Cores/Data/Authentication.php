@@ -2,6 +2,7 @@
 namespace Lukiman\Cores\Data;
 
 class Authentication extends Base {
+	private ?String $id;
 	private ?String $userName;
 	private ?String $password;
 	private ?String $email;
@@ -18,6 +19,15 @@ class Authentication extends Base {
 			if (empty($this->{$k})) $this->{$k} = null;
 		}
 	}
+
+	public function getId() : ?String {
+		return $this->id;
+	}
+
+	public function setId(String $id) {
+		$this->id = $id;
+		return $this;
+	}
 	
 	public function getUserName() : ?String {
 		return $this->userName;
@@ -25,6 +35,7 @@ class Authentication extends Base {
 
 	public function setUserName(String $userName) {
 		$this->userName = $userName;
+		if (empty($this->id)) $this->id = $userName;
 		return $this;
 	}
 

@@ -31,10 +31,10 @@ class Security {
 		$sessionId = Session::generate();
 		
 		//authenticated and check db user exist & active
-		if ($auth->isAuthenticated() AND static::isUserExistAndActive($cred->getUserName()) ) {
+		if ($auth->isAuthenticated() AND static::isUserExistAndActive($cred->getId()) ) {
 			
 			//get authorization
-			$roles = static::getAuthorizations($cred->getUserName());
+			$roles = static::getAuthorizations($cred->getId());
 
 			
 			//save cred & authorization to cache with key session_id
@@ -43,7 +43,7 @@ class Security {
 
 			$entry = ['credential' => $cred, 'authorization' => $roles];
 			
-			$additionalInfos = static::getAdditionalInfos($cred->getUserName());
+			$additionalInfos = static::getAdditionalInfos($cred->getId());
 			if (!empty($additionalInfos)) $entry += $additionalInfos;
 
 			$cache->set($cacheKey, $entry, SESSION_LENGTH);

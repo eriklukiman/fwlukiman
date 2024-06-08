@@ -22,10 +22,11 @@ abstract class Simple extends Base implements IAuthentication {
 		if (!$this->verifyPassword($password, $credentialData->getPassword())) return false;
 
 		$authData = new AuthData();
+		$authData->setId($credentialData->getId());
 		$authData->setUserName($credentialData->getUserName());
-		$authData->setEmail($credentialData->getEmail());
-		$authData->setName($credentialData->getName());
-		$authData->setPicture($credentialData->getPicture());
+		$authData->setEmail($credentialData->getEmail() ?? '');
+		$authData->setName($credentialData->getName() ?? '');
+		$authData->setPicture($credentialData->getPicture() ?? '');
 		$authData->setExpired(strtotime("+" . $this->ttl . " second"));
 		return $this->grantAuthentication($authData);
 	}
