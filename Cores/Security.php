@@ -46,7 +46,9 @@ class Security {
 			$additionalInfos = static::getAdditionalInfos($cred->getId());
 			if (!empty($additionalInfos)) $entry += $additionalInfos;
 
-			$cache->set($cacheKey, $entry, SESSION_LENGTH);
+			$ttl = SESSION_LENGTH;
+			if (!empty($cred) AND !empty($cred->getExpired())) $ttl = $cred->getExpired() - time();
+			$cache->set($cacheKey, $entry, $ttl);
 
 			return [
 				'status'	=> true,
