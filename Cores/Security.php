@@ -9,18 +9,18 @@ use \Lukiman\Cores\Session;
 use \Lukiman\Cores\Authorization\Role;
 
 class Security {
-	public static function loginWithToken(String $token) : array {
-		$auth = new Authentication();
+	public static function loginWithToken(String $token, ?array $config = null) : array {
+		$auth = new Authentication($config);
 		$auth->authWithToken($token);
 		return static::proceedAuthentication($auth);
 	}
 
-	public static function login(String $token) : array {
-		return static::loginWithToken($token);
+	public static function login(String $token, ?array $config = null) : array {
+		return static::loginWithToken($token, $config);
 	}
 
-	public static function loginWithUserPassword(String $username, String $password) : array {
-		$auth = new Authentication();
+	public static function loginWithUserPassword(String $username, String $password, ?array $config = null) : array {
+		$auth = new Authentication($config);
 		$auth->authWithUserPassword($username, $password);
 		return static::proceedAuthentication($auth);
 	}

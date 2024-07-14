@@ -17,6 +17,7 @@ class Tes extends General {
     
     protected $mapping     = array();
 	protected $mappingView = array();
+	protected $dataId;
     
     protected $table_name   ;
 
