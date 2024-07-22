@@ -13,14 +13,14 @@ class Apc extends Base implements ICache {
 	}
 	
 	public function get(String $id) {
-		return apc_fetch($id);
+		return apc_fetch($this->getPrefix() . $id);
 	}
 	
 	public function set(String $id, $value, ?int $ttl = 0) {
-		return apc_store($id, $value, $ttl);
+		return apc_store($this->getPrefix() . $id, $value, $ttl);
 	}
 
 	public function delete(String $id) {
-		return apc_delete($id);
+		return apc_delete($this->getPrefix() . $id);
 	}
 }
