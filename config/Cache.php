@@ -14,6 +14,7 @@ return array (
 	'host'		=> 'localhost',
 	'password'	=> '',
 	'database'		=> '',
+	'prefix'		=> '',
 	'options'	=> [
 		'connect_timeout' 	=> 1,
 		'timeout' 					=> 5
