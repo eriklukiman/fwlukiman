@@ -17,14 +17,14 @@ class Redis extends Base implements ICache {
 	}
 	
 	public function get(String $id) {
-		return $this->cache->get($id);
+		return $this->cache->get($this->getPrefix() . $id);
 	}
 	
 	public function set(String $id, $value, ?int $ttl = null) {
-		return $this->cache->set($id, $value, $ttl);
+		return $this->cache->set($this->getPrefix() . $id, $value, $ttl);
 	}
 	
 	public function delete(String $id) {
-		return $this->cache->del($id);
+		return $this->cache->del($this->getPrefix() . $id);
 	}
 }
