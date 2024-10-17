@@ -20,5 +20,8 @@
         "beberlei/assert": "^3.2",
         "ilexn/swoole-convert-psr7": "^0.3.0",
         "spatie/array-to-xml": "^3.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11"
     }
 }
