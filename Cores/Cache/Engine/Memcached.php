@@ -17,14 +17,14 @@ class Memcached extends Base implements ICache {
 	}
 	
 	public function get(String $id) {
-		return $this->cache->get($id);
+		return $this->cache->get($this->getPrefix() . $id);
 	}
 	
 	public function set(String $id, $value, ?int $ttl = 0) {
-		return $this->cache->set($id, $value, 0);
+		return $this->cache->set($this->getPrefix() . $id, $value, 0);
 	}
 	
 	public function delete(String $id) {
-		return $this->cache->delete($id);
+		return $this->cache->delete($this->getPrefix() . $id);
 	}
 }
