@@ -29,8 +29,8 @@ class Loader {
     public static function Config($file = '') {
         $file = self::$_config . $file . '.php';
 		if (is_readable($file)) return include($file);
-        else if (is_readable(static::getRootFolder() . $file)) return include_once(static::getRootFolder() . $file);
 		else if (is_readable(ROOT_PATH . $file)) return include_once(ROOT_PATH . $file);
+		else if (is_readable(static::getRootFolder() . $file)) return include_once(static::getRootFolder() . $file);
 		else if (is_readable(LUKIMAN_ROOT_PATH . $file)) return include_once(LUKIMAN_ROOT_PATH . $file);
     }
 
