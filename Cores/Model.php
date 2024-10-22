@@ -11,43 +11,49 @@ class Model {
 	protected String $table;
 	protected String $prefix;
 	protected String $primaryKey;
-	protected Database $db;
+	protected ?Database $db;
 	protected array $fields = [];
-	
+
 	public function __construct() {
 		$this->db = Database::getInstance();
 	}
-	
+
 	public function getTable() : String {
 		return $this->table;
 	}
-	
+
 	public function getDb() : Database {
 		if (is_null($this->db)) $this->db = Database::getInstance();
 		return $this->db;
 	}
-	
+
+	public function reconnectDb() : void {
+        if (!is_null($this->db)) $this->db->close();
+        $this->db = null;
+        $this->db = Database::getInstance();
+    }
+
 	public static function getPath() : String {
 		return self::$_path;
 	}
-	
+
 	public static function getPrefixClass() : String {
 		return self::$_prefixClass;
 	}
-	
+
 	public function getPrefix() : String {
 		return $this->prefix;
 	}
-	
+
 	public function getPrimaryKey() : String {
 		if (empty($this->primaryKey)) $this->primaryKey = $this->prefix . 'Id';
 		return $this->primaryKey;
 	}
-	
+
 	public static function load($name) {
 		// Add the model prefix
 		$class = self::$_prefixClass . $name;
-		
+
 		$f = self::getPath() . $name . '.php';
 		$f = str_replace('\\', '/', $f);
 		if (!is_readable($f)) $f = str_replace('_', '/', $f);
@@ -59,7 +65,7 @@ class Model {
 			throw new ExceptionBase("Model '$class' not found!");
 		}
 	}
-	
+
 	public function getFieldsDetail() : array {
 		if (!empty($this->fields)) return $this->fields;
 		$prefix = $this->getPrefix();
@@ -75,18 +81,18 @@ class Model {
 		}
 		return $result;
 	}
-	
+
 	public function getData ($id, array $cols = null) {
 		$q = Database_Query::Select($this->getTable());
 		if (is_array($id)) $q->where($id);
 		else $q->where($this->getPrimaryKey(), $id);
 		if (!empty($cols)) $q->columns($cols);
-		
+
 		$data = $q->execute($this->getDb());
 		$this->getDb()->releaseConnection();
 		return $data;
 	}
-	
+
 	public function read(String $id, array $optWhere = []) : array | null {
 		$q = Database_Query::Select($this->getTable())->where($this->getPrimaryKey(), $id);
 		if (!empty($optWhere)) {
@@ -100,7 +106,7 @@ class Model {
 	public function create(array $data) : int {
 		return $this->insert($data);
 	}
-	
+
 	public function insert(array $data) : int {
 		if (empty($data)) {
 			throw new ExceptionBase('No Data to be added!');
@@ -108,7 +114,7 @@ class Model {
 
 		return Database_Query::Insert($this->getTable())->data($data)->execute($this->getDb());
 	}
-	
+
 	public function update(String $id, $data, array $optWhere = []) : int {
 		//remove ID field from being updated
 		if (array_key_exists($this->getPrimaryKey(), $data)) {
@@ -118,7 +124,7 @@ class Model {
 		if (empty($data)) {
 			throw new ExceptionBase('No Data to be updated!');
 		}
-		
+
 		$q = Database_Query::Update($this->getTable())->data($data)->where($this->getPrimaryKey(), $id);
 		if (!empty($optWhere)) {
 			foreach ($optWhere as $field => $value) {
@@ -128,7 +134,7 @@ class Model {
 		$result = $q->execute($this->getDb());
 		return $result;
 	}
-	
+
 	public function delete(String $id, array $optWhere = []) : int {
 		$q = Database_Query::Delete($this->getTable())->where($this->getPrimaryKey(), $id);
 		if (!empty($optWhere)) {
@@ -138,7 +144,7 @@ class Model {
 		}
 		return $q->execute($this->getDb());
 	}
-	
+
 	public function getServerTimestamp() {
 		$q = $this->query('SELECT NOW() AS time ');
 		$this->releaseConnection();
