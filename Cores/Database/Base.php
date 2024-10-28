@@ -8,15 +8,15 @@ use \Lukiman\Cores\Database\Driver\Swoole;
 use \Lukiman\Cores\Interfaces\Database\{Basic, Transaction, Operation};
 
 class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
-	
+
 	public function __construct() {
 		$param = func_get_args();
 		if (empty($param) AND !empty(self::$_instance)) return self::$_instance;
-		
+
 		call_user_func_array(array(parent::class, '__construct'), $param);
 		return $this;
 	}
-	
+
 	public static function Insert (Database $db, $table = '', $arrValues = array()) : int {
 		$startTrans = false;
 		if (!$db->inTransaction()) {
@@ -72,7 +72,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		if ($commit AND $insertId) return $insertId;
 		else return false;
 	}
-	
+
 	public static function Update (Database $db, $table = '', $arrValues = array(), $where = '1', $bindVars = array(), $join = '') : int {
 		$startTrans = false;
 		if (!$db->inTransaction()) {
@@ -127,13 +127,13 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		if ($commit AND $affectedRows) return $affectedRows;
 		else return false;
 	}
-	
+
 	public static function Delete (Database $db, $table = '', $where = '', $bindVars = array(), $limit = '') : int {
 		$useLimit = '';
 		if (!empty($limit)) {
 			if (!is_array($limit)) $useLimit .= ' LIMIT :_usedLimit ';
 		}
-		
+
 		$startTrans = false;
 		if (!$db->inTransaction()) {
 			$db->beginTransaction ();
@@ -163,7 +163,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		if ($commit AND $affectedRows) return $affectedRows;
 		else return 0;
 	}
-	
+
 	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having = '', $limit = '', $isGrid = false) /*: /*Object*/ {
 		$arrData = array();
 
@@ -191,7 +191,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			if (is_array($limit) AND isset($limit[1])) $useLimit .= ' LIMIT :_usedLimit0, :_usedLimit1 ';
 			else $useLimit .= ' LIMIT :_usedLimit0 ';
 		}
-		
+
 		$q = $db->prepare('SELECT ' . ($isGrid ? ' SQL_CALC_FOUND_ROWS ' : '') . implode(', ', $arrData) . ' FROM ' . $table . ($join == '' ? '' : $join) . ' WHERE ' . self::generateWhere($where, $db) . $groupBy . $orderBy . $useHaving . $useLimit );
 
 		if ($q === false) {
@@ -226,7 +226,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		return $q;
 
 	}
-	
+
 	public static function generateWhere ($where = '1', $db = null) : String {
 		$dbSupplied = true;
 		if (is_null($db)) {
@@ -245,17 +245,25 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			}
 			if (!$dbSupplied) $db->releaseConnection();
 			return $retVal;
-		} 
+		}
 		if (!$dbSupplied) $db->releaseConnection();
 		return $where;
 	}
-	
+
 	public static function generateRandomVariable(int $length = 10) : String {
 		return ':' . self::generateRandomString($length);
 	}
-	
+
 	public static function generateRandomString(int $length = 10) : String {
 		$ret = bin2hex(random_bytes(ceil($length / 2)));
 		return substr($ret, 0, $length);
 	}
+
+	public function close() : bool {
+        return true;
+    }
+
+    public function ping() : bool {
+        return true;
+    }
 }

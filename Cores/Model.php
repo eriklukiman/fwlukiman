@@ -23,7 +23,7 @@ class Model {
 	}
 
 	public function getDb() : Database {
-		if (is_null($this->db)) $this->db = Database::getInstance();
+		if (is_null($this->db) OR !$this->db->ping()) $this->db = Database::getInstance();
 		return $this->db;
 	}
 
