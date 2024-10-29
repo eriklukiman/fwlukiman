@@ -15,7 +15,7 @@ class Model {
 	protected array $fields = [];
 
 	public function __construct() {
-		$this->db = Database::getInstance();
+		$this->db = $this->getDb();
 	}
 
 	public function getTable() : String {
@@ -23,7 +23,7 @@ class Model {
 	}
 
 	public function getDb() : Database {
-		if (is_null($this->db) OR !$this->db->ping()) $this->db = Database::getInstance();
+		if (!isset($this->db) OR is_null($this->db) OR !$this->db->ping()) $this->db = Database::getInstance();
 		return $this->db;
 	}
 

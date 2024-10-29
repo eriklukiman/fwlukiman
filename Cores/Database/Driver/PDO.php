@@ -92,6 +92,7 @@ class PDO extends \PDO implements Basic, Transaction {
         try {
             $this->query('SELECT 1');
         } catch (\PDOException $e) {
+            $this->close();
             return false;
         }
         return true;

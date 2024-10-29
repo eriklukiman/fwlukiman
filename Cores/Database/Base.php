@@ -258,12 +258,4 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		$ret = bin2hex(random_bytes(ceil($length / 2)));
 		return substr($ret, 0, $length);
 	}
-
-	public function close() : bool {
-        return true;
-    }
-
-    public function ping() : bool {
-        return true;
-    }
 }
