@@ -8,7 +8,7 @@ interface Basic {
 
 	public static function getInstance(?Config $config) : Object;
 
-	public function toQuote($string) : String;
+	public function toQuote(String $string) : String;
 
 	public function close() : bool;
 

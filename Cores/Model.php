@@ -50,7 +50,7 @@ class Model {
 		return $this->primaryKey;
 	}
 
-	public static function load($name) {
+	public static function load(String $name) : Object {
 		// Add the model prefix
 		$class = self::$_prefixClass . $name;
 
@@ -82,7 +82,7 @@ class Model {
 		return $result;
 	}
 
-	public function getData ($id, array $cols = null) {
+	public function getData (mixed $id, ?array $cols = null) : mixed {
 		$q = Database_Query::Select($this->getTable());
 		if (is_array($id)) $q->where($id);
 		else $q->where($this->getPrimaryKey(), $id);
@@ -115,7 +115,7 @@ class Model {
 		return Database_Query::Insert($this->getTable())->data($data)->execute($this->getDb());
 	}
 
-	public function update(String $id, $data, array $optWhere = []) : int {
+	public function update(String $id, mixed $data, array $optWhere = []) : int {
 		//remove ID field from being updated
 		if (array_key_exists($this->getPrimaryKey(), $data)) {
 			unset($data[$this->getPrimaryKey()]);
@@ -145,9 +145,9 @@ class Model {
 		return $q->execute($this->getDb());
 	}
 
-	public function getServerTimestamp() {
-		$q = $this->query('SELECT NOW() AS time ');
-		$this->releaseConnection();
+	public function getServerTimestamp() : mixed {
+		$q = $this->getDb()->query('SELECT NOW() AS time ');
+		$this->getDb()->releaseConnection();
 		foreach($q as $v) return $v->time;
 	}
 }

@@ -17,7 +17,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		return $this;
 	}
 
-	public static function Insert (Database $db, $table = '', $arrValues = array()) : int {
+	public static function Insert (Database $db, String $table = '', array $arrValues = []) : int|bool {
 		$startTrans = false;
 		if (!$db->inTransaction()) {
 			$db->beginTransaction ();
@@ -69,11 +69,12 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			$err = $q->errorInfo();
 			throw new ExceptionBase($err[0] . ' (' . $err[1] . ') ' . $err[2], $err[1]);
 		}
-		if ($commit AND $insertId) return $insertId;
-		else return false;
+		if (!$commit) return false;
+		if (!empty($insertId)) return $insertId;
+		return true;
 	}
 
-	public static function Update (Database $db, $table = '', $arrValues = array(), $where = '1', $bindVars = array(), $join = '') : int {
+	public static function Update (Database $db, String $table = '', array $arrValues = [], array|String $where = '1', array $bindVars = [], String $join = '') : int {
 		$startTrans = false;
 		if (!$db->inTransaction()) {
 			$db->beginTransaction ();
@@ -128,7 +129,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		else return false;
 	}
 
-	public static function Delete (Database $db, $table = '', $where = '', $bindVars = array(), $limit = '') : int {
+	public static function Delete (Database $db, String $table = '', array|String $where = '', array $bindVars = [], null|int|array $limit = null) : int {
 		$useLimit = '';
 		if (!empty($limit)) {
 			if (!is_array($limit)) $useLimit .= ' LIMIT :_usedLimit ';
@@ -164,7 +165,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		else return 0;
 	}
 
-	public static function Select (Database $db, $table = '', $arrColumn = '*', $where = '1', $bindVars = array(), $join = '', $order = '', $group = '', $having = '', $limit = '', $isGrid = false) /*: /*Object*/ {
+	public static function Select (Database $db, String $table = '', array|String $arrColumn = '*', array|String $where = '1', array $bindVars = [], String $join = '', String $order = '', String $group = '', String $having = '', null|array|int $limit = null, bool $isGrid = false) : mixed {
 		$arrData = array();
 
 		if (!empty($arrColumn) AND is_array($arrColumn)) {
@@ -227,7 +228,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 
 	}
 
-	public static function generateWhere ($where = '1', $db = null) : String {
+	public static function generateWhere (array|String $where = '1', ?Database $db = null) : String {
 		$dbSupplied = true;
 		if (is_null($db)) {
 			$db = self::getInstance('');

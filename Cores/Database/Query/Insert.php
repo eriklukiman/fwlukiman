@@ -5,7 +5,7 @@ use \Lukiman\Cores\Database;
 use \Lukiman\Cores\Database\Query as Database_Query;
 
 class Insert extends Database_Query {
-	public function execute(Database $db = null) {
+	public function execute(?Database $db = null) : int|bool {
 		parent::execute($db);
 		$db = $this->getValidDb($db);
 		if (empty($this->_data)) $this->combine();

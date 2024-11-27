@@ -5,25 +5,25 @@ use \Lukiman\Cores\Request;
 
 class Json extends Controller {
 	protected $_error = 0;
-	protected $_errorCode = 0;
+	protected int $_errorCode = 0;
 	protected $_errorMessage = '';
-	
-	public function execute($action = 'Index', array $params = null, Request $request = null) {
+
+	public function execute($action = 'Index', ?array $params = null, ?Request $request = null) : mixed {
 		parent::execute($action, $params, $request);
-		
+
 		$this->addHeaders(array(
 			// 'Access-Control-Allow-Origin' 		=> (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '') ),
 			'Access-Control-Allow-Credentials'	=> 'true',
 			'Content-type'						=> 'application/json',
 		));
-		
+
 		$result = $this->getResult();
 		if ( $this->_error OR (is_array($result) AND !isset($result['status'])) ) $result['status'] = array(
 			'error'		=> $this->_error,
 			'errorCode'	=> $this->_errorCode,
 			'message'	=> $this->_errorMessage,
 		);
-		
+
 		if (!empty($result)) {
 			$caller = $this->request->getGetVars('callback');
 			if (!empty($caller)) {
@@ -34,28 +34,28 @@ class Json extends Controller {
 		}
 		return json_encode('');
 	}
-	
-	protected function setError($data) {
+
+	protected function setError(mixed $data) : self {
 		$this->_error = $data;
 		return $this;
 	}
-	
-	protected function setErrorCode($data) {
+
+	protected function setErrorCode(int $data) : self {
 		$this->_errorCode = $data;
 		return $this;
 	}
-	
-	protected function setErrorMessage($data) {
+
+	protected function setErrorMessage(String $data) : self {
 		$this->_errorMessage = $data;
 		return $this;
 	}
-	
-	protected function getError() {
+
+	protected function getError() : array {
 		return array(
 			'error'		=> $this->_error,
 			'errorCode'	=> $this->_errorCode,
 			'message'	=> $this->_errorMessage,
 		);
 	}
-	
+
 }

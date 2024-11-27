@@ -6,17 +6,17 @@ use \Lukiman\Cores\Database\Query as Database_Query;
 
 class Delete extends Database_Query {
 	protected $_useLimit = '';
-	
-	public function execute(Database $db = null) {
+
+	public function execute(?Database $db = null) : int {
 		$db = $this->getValidDb($db);
 		return Database::Delete($db, $this->_table, $this->_where, $this->_bindVars, $this->_useLimit);
 	}
-	
-	public function limit($limit = 1) {
+
+	public function limit(int $limit = 1) : self {
 		if (is_array($limit)) return $this;
 		else $this->_useLimit = $limit;
-		
+
 		return $this;
 	}
-	
+
 }

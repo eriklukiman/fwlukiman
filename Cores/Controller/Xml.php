@@ -15,22 +15,22 @@ class Xml extends Controller {
 	protected bool $prettify = true;
 	protected bool $useXmlDeclaration = true;
 	protected array $processingInstruction = [];
-	
-	public function execute($action = 'Index', array $params = null, Request $request = null) {
+
+	public function execute(String $action = 'Index', ?array $params = null, ?Request $request = null) : mixed {
 		parent::execute($action, $params, $request);
-		
+
 		$this->addHeaders(array(
 			'Access-Control-Allow-Credentials'	=> 'true',
 			'Content-type'						=> 'text/xml',
 		));
-		
+
 		$result = $this->getResult();
 		if ( $this->_error OR (is_array($result) AND !isset($result['status'])) ) $result['status'] = array(
 			'error'		=> $this->_error,
 			'errorCode'	=> $this->_errorCode,
 			'message'	=> $this->_errorMessage,
 		);
-		
+
 		$xml = new ArrayToXml($result, $this->rootAttributes, true, $this->xmlEncoding, $this->xmlVersion);
 		if ($this->prettify) $xml->prettify();
 		if (!$this->useXmlDeclaration) $xml->dropXmlDeclaration();
@@ -39,28 +39,28 @@ class Xml extends Controller {
 		}
 		return $xml->toXml();
 	}
-	
-	protected function setError($data) {
+
+	protected function setError(mixed $data) : self {
 		$this->_error = $data;
 		return $this;
 	}
-	
-	protected function setErrorCode($data) {
+
+	protected function setErrorCode(int $data) : self {
 		$this->_errorCode = $data;
 		return $this;
 	}
-	
-	protected function setErrorMessage($data) {
+
+	protected function setErrorMessage(String $data) : self {
 		$this->_errorMessage = $data;
 		return $this;
 	}
-	
-	protected function getError() {
+
+	protected function getError() : array {
 		return array(
 			'error'		=> $this->_error,
 			'errorCode'	=> $this->_errorCode,
 			'message'	=> $this->_errorMessage,
 		);
 	}
-	
+
 }

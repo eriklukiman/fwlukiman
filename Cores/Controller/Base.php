@@ -5,61 +5,61 @@ use \Lukiman\Cores\Request;
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
 
 class Base {
-	protected static $_path = 'Modules/';
-	protected static $_prefixClass = 'Modules\\';
-	protected $result = '';
-	protected $headers = [];
-    
+	protected static String $_path = 'Modules/';
+	protected static String $_prefixClass = 'Modules\\';
+	protected mixed $result = '';
+	protected ?array $headers = [];
+
     protected $request ;
-    
+
     protected static $action ;
-    
+
     public function __construct () {
     }
-    
-    private static function Include_File($name, $pathPrefix = '') {
+
+    private static function Include_File(String $name, String $pathPrefix = '') : void {
 		$f = self::getPath($pathPrefix) . $name . '.php';
 		$f = str_replace('\\', '/', $f);
 		if (!is_readable($f)) $f = str_replace('_', '/', $f);
 		if (is_readable($f)) include_once($f);
 	}
-	
-	public static function load($name, $prefix = '') {
+
+	public static function load(String $name, String $prefix = '') : self|String {
 		if (empty($name)) return new self();
 
 		$class = self::getPrefix($prefix) . $name;
 		self::Include_File($name, $prefix);
-		$class = '\\' . LUKIMAN_NAMESPACE_PREFIX . '\\' . $class; 
+		$class = '\\' . LUKIMAN_NAMESPACE_PREFIX . '\\' . $class;
 
 		return new $class;
 	}
-	
-	public static function exists ($name, $prefix = '') {
+
+	public static function exists (String $name, String $prefix = '') : bool {
 		self::Include_File($name, $prefix);
 		return class_exists('\\' . LUKIMAN_NAMESPACE_PREFIX . '\\' . self::getPrefix($prefix) . $name);
 	}
-	
-	public static function getPrefix($usedPrefix = '') {
+
+	public static function getPrefix(String $usedPrefix = '') : String {
 		if (!empty($usedPrefix)) return $usedPrefix . (substr($usedPrefix,-1) == '\\' ? '' : '\\');
 		else return self::$_prefixClass;
 	}
-	
-	public static function getPath($usedPathPrefix = '') {
+
+	public static function getPath(String $usedPathPrefix = '') : String {
 		if (!empty($usedPathPrefix)) return '';
 		else return self::$_path;
 	}
-	
-	public function execute ($action = 'Index', array $params = null, Request $request = null) {
+
+	public function execute (String $action = 'Index', ?array $params = null, ?Request $request = null) : mixed {
 		if (empty($action) OR ($action == 'Publics')) $action = 'Index';
 		$doAction = 'do_' . $action;
-		
+
 		if (!method_exists($this, $doAction)) {
 			if ($action != 'Index') array_unshift($params, $action);
 			$doAction = 'do_Index';
 		}
 
         $this->catchRequestParams($params, $request);
-        
+
 		if (strcasecmp($this->request->getmethod(), 'options') == 0) {
 			return static::optionsHandler($params);
 		}
@@ -74,12 +74,12 @@ class Base {
 			throw new ExceptionBase('Method "' . $action . '" not defined!'); //return error
 		}
 		if (!empty($retVal) OR is_array($retVal)) $this->appendResult($retVal);
-		
+
 		$this->afterExecute();
 		return $this->getResult();
 	}
-	
-	protected function appendResult ($res, $truncate = false) {
+
+	protected function appendResult (mixed $res, bool $truncate = false) : void {
 		if ($truncate) $this->result = '';
 		if (empty($this->result)) $this->result = $res;
 		else if (is_array($this->result)) {
@@ -90,50 +90,50 @@ class Base {
 			else $this->result .= $res;
 		}
 	}
-	
-	protected function getResult () {
+
+	protected function getResult () : mixed {
 		return $this->result;
 	}
-	
-	public function getHeaders() {
+
+	public function getHeaders() : ?array {
 		return $this->headers;
 	}
-	
-	public function sendHeaders() {
+
+	public function sendHeaders() : void {
 		if (!headers_sent()) {
 			$headers = $this->getHeaders();
 			foreach($headers as $k => $v) header($k . ': ' . $v);
 		}
 	}
-	
-	protected function setHeaders(array $headers) {
+
+	protected function setHeaders(?array $headers) : void {
 		$this->headers = $headers;
 	}
-	
-	protected function addHeaders(array $headers) {
+
+	protected function addHeaders(?array $headers) : void {
 		$this->headers = array_merge($this->headers, $headers);
 	}
 
-	protected function beforeExecute () {}
-	
-	protected function afterExecute () {}
-	
-	protected function getRequest () {
+	protected function beforeExecute () : void {}
+
+	protected function afterExecute () : void {}
+
+	protected function getRequest () : mixed {
 		return $this->request;
 	}
-	
-	protected function catchRequestParams($params = null, $request = null) {
+
+	protected function catchRequestParams(mixed $params = null, mixed $request = null) : void {
 		if (!is_null($request)) {
 			if (get_class($request) == Request::class) $this->request = $request;
 			else $this->request = new Request($request);
 		} else $this->request = new Request();
 	}
-    
-    public static function set_action($action = '') {
+
+    public static function set_action(String $action = '') : void {
         self::$action      = $action;
     }
-    
-	public function do_AvailableFunctions() {
+
+	public function do_AvailableFunctions() : array {
 		$all = get_class_methods($this);
 		$result = array();
 		foreach ($all as $v) {
@@ -143,7 +143,7 @@ class Base {
 		return ['actions' => $result];
 	}
 
-	protected function parseValue ($template, $value) {
+	protected function parseValue (mixed $template, mixed $value) : mixed {
         foreach($value as $k => $v) {
 			$template = str_replace('{' . $k . '}', $v, $template);
 		}
@@ -151,9 +151,8 @@ class Base {
         return $template;
     }
 
-    protected function optionsHandler(array $param) {
+    protected function optionsHandler(?array $param) : void {
     	$this->addHeaders(['Access-Control-Allow-Methods' => 'POST, GET, OPTIONS, DELETE, PUT, PATCH']);
-    	return ;
     }
 
 }
