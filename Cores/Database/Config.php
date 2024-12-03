@@ -11,7 +11,7 @@ class Config {
 	protected $database;
 	protected $timeout = 2;
 	protected $options = [];
-	
+
 	public function __construct(array $conf) {
 		if (isset($conf['engine'])) $this->engine = $conf['engine'];
 		if (isset($conf['driver'])) $this->driver = $conf['driver'];
@@ -23,12 +23,12 @@ class Config {
 		if (isset($conf['timeout'])) $this->timeout = $conf['timeout'];
 		if (isset($conf['options'])) $this->options = $conf['options'];
 	}
-	
-	public function __get($key) {
+
+	public function __get(String $key) : mixed {
         return $this->{$key};
     }
 
-    public function __set($key, $value) {
+    public function __set(String $key, mixed $value) : void {
         $this->{$key} = $value;
     }
 }

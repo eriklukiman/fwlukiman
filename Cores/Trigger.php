@@ -12,14 +12,14 @@ class Trigger implements Interfaces\Trigger {
 
     protected static String $eol = "\r\n";
 
-    public function __construct($connectionTimeout = 5) {
+    public function __construct(int $connectionTimeout = 5) {
         $this->connectionTimeout = $connectionTimeout;
     }
 
 	public function get(String $url, String|array $params = '') : void {
         $this->fire('GET', $url, $params);
     }
-	
+
 	public function post(String $url, String|array $params = '') : void {
         $this->fire('POST', $url, $params);
     }
@@ -37,6 +37,8 @@ class Trigger implements Interfaces\Trigger {
     }
 
     protected function fire(String $method, String $url, String|array $params = '') : void {
+        $errno = 0;
+        $errstr = '';
         $this->setUrl($url);
         $this->setMethod($method);
         $this->setBody($params);
@@ -103,7 +105,7 @@ class Trigger implements Interfaces\Trigger {
         return $this->headers;
     }
 
-    protected function addHeaders(array $newHeaders, $isOverwrite = false) : void {
+    protected function addHeaders(array $newHeaders, bool $isOverwrite = false) : void {
         foreach ($newHeaders as $k => $v) {
             if (is_numeric($k)) $this->headers[] = $v;
             else if ($isOverwrite OR !array_key_exists($k, $this->headers)) $this->headers[$k] = $v;

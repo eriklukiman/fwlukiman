@@ -1,8 +1,6 @@
 <?php
 namespace Lukiman\Cores;
 
-use \Lukiman\Cores\Exception\Base as ExceptionBase;
-
 class Encryption implements Interfaces\Encryption {
 	static protected array $config;
 
@@ -18,8 +16,8 @@ class Encryption implements Interfaces\Encryption {
 		$this->instance = Encryption\Factory::instantiate($config);
 		return $this;
 	}
-	
-	public static function getInstance(?array $config = null) {
+
+	public static function getInstance(?array $config = null) : self {
 		if (empty($config)) {
 			if (empty(static::$config)) {
 				static::$config = Loader::Config('Encryption');
@@ -29,11 +27,11 @@ class Encryption implements Interfaces\Encryption {
 
         return new static($config);
 	}
-	
+
 	public static function setConfig(array $config) : void {
 		static::$config = $config;
 	}
-	
+
     public function encrypt(String $str) : String {
         return $this->instance->encrypt($str);
     }

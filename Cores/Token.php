@@ -21,7 +21,7 @@ class Token {
         return $this;
 	}
 
-	public static function getInstance(?array $config = null) {
+	public static function getInstance(?array $config = null) : self {
 		if (empty($config)) {
 			if (empty(static::$config)) {
 				static::$config = Loader::Config('Token');
@@ -29,12 +29,12 @@ class Token {
 			$config = static::$config;
 		}
 
-    if(empty(static::$instance)) {
-        static::$instance = new static($config);
-    }
-    return static::$instance;
+        if(empty(static::$instance)) {
+            static::$instance = new static($config);
+        }
+        return static::$instance;
 }
-	
+
     public static function isValid(String $token) : bool {
         static::getInstance();
         $now = static::generate();

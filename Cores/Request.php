@@ -36,20 +36,20 @@ class Request {
 			if (empty($this->body) AND !empty($this->post)) $this->body = key($this->post);
     }
 
-	public function getRequest() {
+	public function getRequest() : mixed {
 		return $this->request;
 	}
 
-	public function getHeaders($key = '') {
+	public function getHeaders(String $key = '') : mixed {
 		if (empty($key)) return $this->request->getHeaders();
 		else return $this->request->getHeader($key);
 	}
 
-	public function getCookies() {
+	public function getCookies() : mixed {
 		return $this->request->getCookieParams();
 	}
 
-	public function getSimpleCookies() {
+	public function getSimpleCookies() : mixed {
 		$cookies = $this->request->getCookieParams();
         $ret = [];
         foreach($cookies as $k => $v) $ret[] = $k . '=' . $v;
@@ -69,7 +69,7 @@ class Request {
      * @param type $key
      * @return type
      */
-    public function getPostVars($key = '') {
+    public function getPostVars(String $key = '') : mixed {
         if(!empty($key)) {
             if(isset($this->post[$key])) {
                 return ($this->post[$key]);
@@ -86,7 +86,7 @@ class Request {
      * @param type $key
      * @return type
      */
-    public function getGetVars($key = '') {
+    public function getGetVars(String $key = '') : mixed {
         if(!empty($key)) {
             if(isset($this->get[$key])) {
                 return ($this->get[$key]);
@@ -103,7 +103,7 @@ class Request {
      * @param type $key
      * @return type
      */
-    public function getFilesVars($key = '') {
+    public function getFilesVars(String $key = '') : mixed {
         if(!empty($key)) {
             if(isset($this->files[$key])) {
                 return ($this->files[$key]);
@@ -119,7 +119,7 @@ class Request {
      * Get data param from URL
      * @return string/array
      */
-    public function getParams($key = '') {
+    public function getParams(String $key = '') : String|array {
         if($key === '') {
             return $this->params;
         } else {
@@ -135,7 +135,7 @@ class Request {
      * Get action from URL
      * @return string
      */
-    public function getAction() {
+    public function getAction() : String {
         return $this->action;
     }
 
@@ -143,7 +143,7 @@ class Request {
      * Get request uri from URL
      * @return string
      */
-    public function getUri() {
+    public function getUri() : String {
         return $this->request->getUri();
     }
 
@@ -151,7 +151,7 @@ class Request {
      * Get request method
      * @return string
      */
-    public function getMethod() {
+    public function getMethod() : String {
         return $this->request->getMethod();
     }
 
@@ -159,7 +159,7 @@ class Request {
      * Get data request body
      * @return type
      */
-    public function getBody() {
+    public function getBody() : mixed {
 		return $this->body;
     }
 
@@ -194,7 +194,7 @@ class Request {
      * @param type none
      * @return raw GET
      */
-    public function getQueryString() {
+    public function getQueryString() : mixed {
         return $this->getUri()->getQuery();
     }
 
