@@ -109,7 +109,7 @@ class Select extends Database_Query {
 		$this->_groupBy = '';
 		$this->_orderBy = '';
 		$this->_useHaving = '';
-		$this->_useLimit = '';
+		$this->_useLimit = null;
 		$this->_rowCount = 0;
 		return $this;
 	}

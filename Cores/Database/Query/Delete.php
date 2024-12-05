@@ -5,7 +5,7 @@ use \Lukiman\Cores\Database;
 use \Lukiman\Cores\Database\Query as Database_Query;
 
 class Delete extends Database_Query {
-	protected $_useLimit = '';
+	protected null|int|array $_useLimit = null;
 
 	public function execute(?Database $db = null) : int {
 		$db = $this->getValidDb($db);
