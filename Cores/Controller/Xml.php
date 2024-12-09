@@ -50,7 +50,7 @@ class Xml extends Controller {
 		return $this;
 	}
 
-	protected function setErrorMessage(String $data) : self {
+	protected function setErrorMessage(array|String $data) : self {
 		$this->_errorMessage = $data;
 		return $this;
 	}
