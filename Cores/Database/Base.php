@@ -216,6 +216,9 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 			$q->execute();
 		} catch (ExceptionBase $e) {
 			if ($e instanceof ExceptionBase) die(__CLASS__ . ' : ' . $e->getMessage());
+		} catch (\Exception $e) {
+		    if ($e instanceof \Exception) throw new ExceptionBase($e->getMessage());
+			die(__CLASS__ . ' : ' . $e->getMessage());
 		} finally {
 			if (!$isGrid) $db->releaseConnection();
 		}
