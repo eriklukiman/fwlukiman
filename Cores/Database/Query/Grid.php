@@ -25,8 +25,9 @@ class Grid extends Select {
 	public function execute(?Database $db = null) : self {
 		// parent::execute($db);
 		$db = $this->getValidDb($db);
+		$groupBy = "";
 		if (is_array($this->_orderBy)) $this->_orderBy = implode(' , ', $this->_orderBy);
-		if (is_array($this->_groupBy)) $this->_groupBy = implode(' , ', $this->_groupBy);
+		if (is_array($this->_groupBy)) $groupBy = implode(' , ', $this->_groupBy);
 		if (is_array($this->_useHaving)) $this->_useHaving = implode(' , ', $this->_useHaving);
 
 		$this->detectRowsPerPage();
@@ -36,7 +37,7 @@ class Grid extends Select {
 		if (is_array($this->_join)) $this->_join = implode(' ', $this->_join);
 		// Database::activate($setting);
 		// print_r($this);
-		$this->_dbStatement = Database::Select($db, $this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $this->_groupBy, $this->_useHaving, $this->_useLimit, true);
+		$this->_dbStatement = Database::Select($db, $this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $groupBy, $this->_useHaving, $this->_useLimit, true);
 		// print_r($this->_dbStatement);
 		// print_r($this);
 		// $rs1 = Database::getInstance()->query('SELECT FOUND_ROWS() ');

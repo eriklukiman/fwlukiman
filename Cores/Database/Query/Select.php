@@ -8,7 +8,7 @@ class Select extends Database_Query {
 	protected mixed $_dbStatement = null;
 	protected null|String|array $_join = array();
 	protected String $_orderBy = '';
-	protected String $_groupBy = '';
+	protected array $_groupBy = [];
 	protected String $_useHaving = '';
 	protected null|int|array $_useLimit = null;
 	protected int $_rowCount = 0;
@@ -17,13 +17,14 @@ class Select extends Database_Query {
 		parent::execute($db);
 		// if (is_null($db)) $db = $this->_db;
 		$db = $this->getValidDb($db);
+		$groupBy = "";
 		if (is_array($this->_orderBy)) $this->_orderBy = implode(' , ', $this->_orderBy);
-		if (is_array($this->_groupBy)) $this->_groupBy = implode(' , ', $this->_groupBy);
+		if (is_array($this->_groupBy)) $groupBy = implode(' , ', $this->_groupBy);
 		if (is_array($this->_useHaving)) $this->_useHaving = implode(' , ', $this->_useHaving);
 
 		if (is_array($this->_join)) $this->_join = implode(' ', $this->_join);
 		// Database::activate($setting);
-		$this->_dbStatement = Database::Select($db, $this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $this->_groupBy, $this->_useHaving, $this->_useLimit);
+		$this->_dbStatement = Database::Select($db, $this->_table, $this->_columns, $this->_where, $this->_bindVars, $this->_join, $this->_orderBy, $groupBy, $this->_useHaving, $this->_useLimit);
 		$this->_rowCount = $this->_dbStatement->rowCount();
 		return $this;
 	}
