@@ -8,7 +8,7 @@ class Select extends Database_Query {
 	protected mixed $_dbStatement = null;
 	protected null|String|array $_join = array();
 	protected String $_orderBy = '';
-	protected String $_groupBy = '';
+	protected array|String $_groupBy = [];
 	protected String $_useHaving = '';
 	protected null|int|array $_useLimit = null;
 	protected int $_rowCount = 0;
