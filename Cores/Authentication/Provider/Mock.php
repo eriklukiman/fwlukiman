@@ -8,6 +8,7 @@ use \Lukiman\Cores\Data\Authentication as AuthData;
 class Mock extends Base implements IAuthentication {
 	
 	public function __construct(?array $config = null) {
+		parent::__construct($config);
 		$authData = new AuthData();
 		$authData->setUserName('test@test.com');
 		$authData->setEmail('test@test.com');

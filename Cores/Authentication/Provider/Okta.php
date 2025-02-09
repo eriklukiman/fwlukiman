@@ -13,6 +13,7 @@ class Okta extends Base implements IAuthentication {
 	private bool $authInProgress = false;
 	
 	public function __construct(?array $config = null) {
+		parent::__construct($config);
 		if (!empty($config) AND !empty($config['baseURL'])) {
 			$this->baseURL = $config['baseURL'];
 		} else {
@@ -62,7 +63,7 @@ class Okta extends Base implements IAuthentication {
 			$authData->setUserName($input['username']);
 			$authData->setEmail($input['username']);
 			$authData->setName($input['username']);
-			$authData->setExpired(intval($input['exp']));
+			$authData->setExpired($this->calculateLeastExpiryTimestamp(intval($input['exp']), intval($input['iat'])));
 			$authData->setCreated(intval($input['iat']));
 			$authData->setAuthProvider($input['iss']);
 		}

@@ -7,14 +7,7 @@ use \Lukiman\Cores\Data\Authentication as AuthData;
 use \Lukiman\Cores\Model;
 
 abstract class Simple extends Base implements IAuthentication {
-	protected int $ttl = 3600; //in seconds
-	
-	public function __construct(?array $config = null) {
-		if (!empty($config) AND !empty($config['ttl'])) {
-			$this->ttl = $config['ttl'];
-		}
-	}
-	
+
 	public function authWithUserPassword(String $username, String $password) : bool {
 		if (empty($username) OR empty($password)) return false;
 		$credentialData = $this->getCredentialData($username);
@@ -40,5 +33,5 @@ abstract class Simple extends Base implements IAuthentication {
 	protected function verifyPassword(String $password, String $hash) : bool {
 		return password_verify($password, $hash);
 	}
-	
+
 }

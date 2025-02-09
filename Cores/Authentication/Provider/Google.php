@@ -11,6 +11,7 @@ class Google extends Base implements IAuthentication {
 	private bool $authInProgress = false;
 	
 	public function __construct(?array $config = null) {
+		parent::__construct($config);
 		if (!empty($config) AND !empty($config['applicationID'])) {
 			$this->applicationID = $config['applicationID'];
 		} else {
@@ -45,7 +46,7 @@ class Google extends Base implements IAuthentication {
 			$authData->setEmail($input['email']);
 			$authData->setName($input['name']);
 			$authData->setPicture($input['picture']);
-			$authData->setExpired(intval($input['exp']));
+			$authData->setExpired($this->calculateLeastExpiryTimestamp(intval($input['exp']), intval($input['iat'])));
 			$authData->setCreated(intval($input['iat']));
 			$authData->setAuthProvider($input['iss']);
 		}
