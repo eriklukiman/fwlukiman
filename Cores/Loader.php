@@ -23,11 +23,35 @@ class Loader {
 	}
 
     /**
-     * Function for load file configuration
+     * Resolve Config file Path 
+     * this method will check if env config file exists (config.{env}.php)
+     *
      * @param type $file
+     * 
+     * @return string
+     * */
+    public static function resolveConfigFile(string $file = '') :string {
+        $file = self::$_config . $file;
+        
+        if (defined('DEFAULT_ENV')) {
+            $envFile = $file.'.'.DEFAULT_ENV.'.php';
+            
+            if (is_readable($envFile)) {
+                return $envFile;
+            }
+        }
+        
+        return $file. '.php';
+    }
+
+    /**
+     * Function for load file configuration
+     * @param string $file
+     *
+     * @return mixed
      */
     public static function Config(String $file = '') : mixed {
-        $file = self::$_config . $file . '.php';
+        $file = self::resolveConfigFile($file);
 		if (is_readable($file)) return include($file);
 		else if (is_readable(ROOT_PATH . $file)) return include_once(ROOT_PATH . $file);
 		else if (is_readable(static::getRootFolder() . $file)) return include_once(static::getRootFolder() . $file);
