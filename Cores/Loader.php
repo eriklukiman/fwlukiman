@@ -23,6 +23,22 @@ class Loader {
 	}
 
     /**
+    * Resolve Env file Path
+    * this method will check if env config file exists (config.{env}.php)
+    * 
+    * @param string $file
+    *
+    * @return Env
+    * */
+    private static function resolveEnv(String $file) : Env {
+        if (is_readable($file)) return include($file);
+		else if (is_readable(ROOT_PATH . $file)) return include_once(ROOT_PATH . $file);
+		else if (is_readable(static::getRootFolder() . $file)) return include_once(static::getRootFolder() . $file);
+		else if (is_readable(LUKIMAN_ROOT_PATH . $file)) return include_once(LUKIMAN_ROOT_PATH . $file);
+        else return Env::PRODUCTION;
+    }
+
+    /**
      * Resolve Config file Path 
      * this method will check if env config file exists (config.{env}.php)
      *
@@ -32,9 +48,11 @@ class Loader {
      * */
     public static function resolveConfigFile(string $file = '') :string {
         $file = self::$_config . $file;
+
+        $env = self::resolveEnv(self::$_config . 'env.php');
         
-        if (defined('DEFAULT_ENV')) {
-            $envFile = $file.'.'.DEFAULT_ENV.'.php';
+        if (!empty($env)) {
+            $envFile = $file.'.'.$env->getPathname().'.php';
             
             if (is_readable($envFile)) {
                 return $envFile;

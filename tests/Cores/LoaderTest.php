@@ -14,9 +14,24 @@ final class LoaderTest extends TestCase {
     $this->assertEquals($expected, Loader::resolveConfigFile($file));
   }
 
-  public function testResolveConfigFileWithEnv(): void {
-    $file = 'Database';
-    $expected = 'config/Database.staging.php';
+  public function testResolveConfigFileWithStagingEnv(): void {
+    $file = 'DummyConfig';
+    $envFile = 'config/env.php';
+    $expected = 'config/' . $file . '.staging.php';
+    file_put_contents($envFile, '<?php use Lukiman\Cores\Env; return Env::STAGING;');
+
+    touch($expected);
     $this->assertEquals($expected, Loader::resolveConfigFile($file));
+    unlink($expected);
+    unlink($envFile);
+  }
+
+  public function testResolveConfigFileDefaultProductionEnv(): void {
+    $file = 'DummyConfig';
+    $expected = 'config/' . $file . '.production.php';
+
+    touch($expected);
+    $this->assertEquals($expected, Loader::resolveConfigFile($file));
+    unlink($expected);
   }
 }
