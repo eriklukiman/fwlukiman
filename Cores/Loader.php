@@ -49,7 +49,7 @@ class Loader {
     public static function resolveConfigFile(string $file = '') :string {
         $file = self::$_config . $file;
 
-        $env = self::resolveEnv(self::$_config . 'env.php');
+        $env = self::resolveEnv(self::$_config . 'Env.php');
         
         if (!empty($env)) {
             $envFile = $file.'.'.$env->getPathname().'.php';

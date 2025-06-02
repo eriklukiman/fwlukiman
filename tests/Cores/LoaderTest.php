@@ -16,7 +16,7 @@ final class LoaderTest extends TestCase {
 
   public function testResolveConfigFileWithStagingEnv(): void {
     $file = 'DummyConfig';
-    $envFile = 'config/env.php';
+    $envFile = 'config/Env.php';
     $expected = 'config/' . $file . '.staging.php';
     file_put_contents($envFile, '<?php use Lukiman\Cores\Env; return Env::STAGING;');
 
