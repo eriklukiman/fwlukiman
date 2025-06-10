@@ -1,10 +1,16 @@
 <?php
+
 namespace Lukiman\Cores;
+
+use Psr\Http\Message\UriInterface;
 
 class Request {
     protected $params;
     protected $action;
     protected $body;
+    /**
+    * @var \Psr\Http\Message\ServerRequestInterface
+    * */
 	protected $request;
 	protected $post;
 	protected $get;
@@ -141,10 +147,11 @@ class Request {
 
     /**
      * Get request uri from URL
-     * @return string
+     * 
+     * @return \Psr\Http\Message\UriInterface|string|null
      */
-    public function getUri() : String {
-        return $this->request->getUri();
+    public function getUri() : UriInterface|String|null {
+        return $this->request?->getUri();
     }
 
     /**
