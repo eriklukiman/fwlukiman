@@ -13,6 +13,9 @@
             "Lukiman\\": ""
         }
     },
+    "scripts": {
+        "test": "phpunit --bootstrap includes/const.php --testdox --display-notices --display-warnings --display-deprecations tests"
+    },
     "require": {
         "nyholm/psr7-server": "^1.0",
         "nyholm/psr7": "^1.2",

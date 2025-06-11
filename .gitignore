@@ -10,3 +10,5 @@
 *.sublime-workspace
 *.sublime-project
 
+# Ignore all files in config that have two extensions like .staging.php
+config/*.*.php
