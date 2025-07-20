@@ -29,9 +29,23 @@ final class LoaderTest extends TestCase {
   public function testResolveConfigFileDefaultProductionEnv(): void {
     $file = 'DummyConfig';
     $expected = 'config/' . $file . '.production.php';
+    copy('config/Env_example.php', 'config/Env.php');
 
     touch($expected);
     $this->assertEquals($expected, Loader::resolveConfigFile($file));
     unlink($expected);
+    unlink('config/Env.php');
+  }
+
+  public function testResolveConfigFileDefaultDevelopmentEnv(): void {
+    $file = 'DummyConfig';
+    $envFile = 'config/Env.php';
+    $expected = 'config/' . $file . '.php';
+    file_put_contents($envFile, '<?php use Lukiman\Cores\Env; return Env::DEVELOPMENT;');
+
+    touch($expected);
+    $this->assertEquals($expected, Loader::resolveConfigFile($file));
+    unlink($expected);
+    unlink($envFile);
   }
 }
