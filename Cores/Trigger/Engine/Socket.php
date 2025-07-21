@@ -490,4 +490,8 @@ class Socket implements Trigger {
       default => 80,
     };
   }
+
+  public static function allowSingleton(): bool {
+    return true;
+  }
 }

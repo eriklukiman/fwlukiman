@@ -11,4 +11,6 @@ interface Trigger {
 	public function patch(String $url, String|array $params) : void;
 
 	public function delete(String $url, String|array $params) : void;
+	
+  public function addHeaders(array $headers, bool $isOverwrite = false) : void;
 }

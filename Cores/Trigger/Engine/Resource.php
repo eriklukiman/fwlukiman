@@ -106,7 +106,7 @@ class Resource implements Trigger {
         return $this->headers;
     }
 
-    protected function addHeaders(array $newHeaders, bool $isOverwrite = false) : void {
+    public function addHeaders(array $newHeaders, bool $isOverwrite = false) : void {
         foreach ($newHeaders as $k => $v) {
             if (is_numeric($k)) $this->headers[] = $v;
             else if ($isOverwrite OR !array_key_exists($k, $this->headers)) $this->headers[$k] = $v;
@@ -203,4 +203,8 @@ class Resource implements Trigger {
 
         return $respBody;
     }
+    
+	public static function allowSingleton() : bool {
+		return true;
+	}
 }

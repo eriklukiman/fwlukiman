@@ -59,4 +59,8 @@ class Trigger implements Interfaces\Trigger {
 	public function delete(String $url, String|array $params = '') : void {
         $this->trigger->delete($url, $params);
     }
+
+    public function addHeaders(array $headers, bool $isOverwrite = false) : void {
+        $this->trigger->addHeaders($headers, $isOverwrite);
+    }
 }

@@ -11,11 +11,12 @@ class Factory {
    * instantiate trigger engine
    *
    * @param string $engine
+   * @param int $connectionTimeout
    * @return Trigger
    * */
-  public static function instantiate(string $engine): Trigger {
+  public static function instantiate(string $engine, int $connectionTimeout): Trigger {
     $class = static::$path . ucfirst(strtolower($engine));
-    return new $class();
+    return new $class($connectionTimeout);
   }
 
   /**
