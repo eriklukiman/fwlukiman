@@ -5,6 +5,7 @@ namespace Lukiman\Cores;
 enum Env {
   case PRODUCTION;
   case STAGING;
+  case DEVELOPMENT;
 
   /**
    * Get environment path name
@@ -13,8 +14,9 @@ enum Env {
    * */
   public function getPathname(): string {
     return match ($this) {
-      self::PRODUCTION => 'production',
-      self::STAGING => 'staging',
+      self::PRODUCTION => '.production',
+      self::STAGING => '.staging',
+      self::DEVELOPMENT => '',
     };
   }
 }

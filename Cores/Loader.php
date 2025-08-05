@@ -30,12 +30,12 @@ class Loader {
     *
     * @return Env
     * */
-    private static function resolveEnv(String $file) : Env {
-        if (is_readable($file)) return include($file);
-		else if (is_readable(ROOT_PATH . $file)) return include_once(ROOT_PATH . $file);
-		else if (is_readable(static::getRootFolder() . $file)) return include_once(static::getRootFolder() . $file);
-		else if (is_readable(LUKIMAN_ROOT_PATH . $file)) return include_once(LUKIMAN_ROOT_PATH . $file);
-        else return Env::PRODUCTION;
+    private static function resolveEnv(String $file) : Env|null { 
+        $env = null;
+        if (is_readable($file)) $env = include_once($file);
+		else if (is_readable(ROOT_PATH . $file)) $env = include_once(ROOT_PATH . $file);
+		else if (is_readable(LUKIMAN_ROOT_PATH . $file)) $env = include_once(LUKIMAN_ROOT_PATH . $file);
+        return $env instanceof Env ? $env : null;
     }
 
     /**
@@ -51,8 +51,8 @@ class Loader {
 
         $env = self::resolveEnv(self::$_config . 'Env.php');
         
-        if (!empty($env)) {
-            $envFile = $file.'.'.$env->getPathname().'.php';
+        if (!empty($env) && $env instanceof Env) {
+            $envFile = $file.$env->getPathname().'.php';
             
             if (is_readable($envFile)) {
                 return $envFile;
