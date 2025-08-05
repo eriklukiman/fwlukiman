@@ -4,7 +4,7 @@ namespace Lukiman\Cores\Trigger\Engine;
 use Lukiman\Cores\Exception\Base as ExceptionBase;
 use Lukiman\Cores\Interfaces\Trigger;
 
-class Resource implements Trigger {
+class Resource extends Base implements Trigger {
     protected int $connectionTimeout;
     protected array $headers;
     protected String $method;
@@ -15,26 +15,6 @@ class Resource implements Trigger {
 
     public function __construct(int $connectionTimeout = 5) {
         $this->connectionTimeout = $connectionTimeout;
-    }
-
-	public function get(String $url, String|array $params = '') : void {
-        $this->fire('GET', $url, $params);
-    }
-
-	public function post(String $url, String|array $params = '') : void {
-        $this->fire('POST', $url, $params);
-    }
-
-	public function put(String $url, String|array $params = '') : void {
-        $this->fire('PUT', $url, $params);
-    }
-
-	public function patch(String $url, String|array $params = '') : void {
-        $this->fire('PATCH', $url, $params);
-    }
-
-	public function delete(String $url, String|array $params = '') : void {
-        $this->fire('DELETE', $url, $params);
     }
 
     protected function fire(String $method, String $url, String|array $params = '') : void {
@@ -71,48 +51,6 @@ class Resource implements Trigger {
         return $req;
     }
 
-    protected function getUrl() : array {
-        return $this->url;
-    }
-
-    protected function setUrl(String $url) : void {
-        $this->url = parse_url($url);
-        if (empty($this->url['scheme']) OR empty($this->url['host'])) {
-            throw new ExceptionBase('URL is not valid!');
-        }
-        if (empty($this->url['port'])) $this->url['port'] = static::getDefaultPort($this->url['scheme']);
-        if (empty($this->url['path'])) $this->url['path'] = '/';
-    }
-
-
-    protected function getBody() : String {
-        return $this->body;
-    }
-
-    protected function setBody(String|array $params) : void {
-        if (is_array($params)) $this->body = http_build_query($params);
-        else $this->body = $params;
-    }
-
-    protected function getMethod() : String {
-        return $this->method;
-    }
-
-    protected function setMethod(String $method) : void {
-        $this->method = $method;
-    }
-
-    protected function getHeaders() : array {
-        return $this->headers;
-    }
-
-    public function addHeaders(array $newHeaders, bool $isOverwrite = false) : void {
-        foreach ($newHeaders as $k => $v) {
-            if (is_numeric($k)) $this->headers[] = $v;
-            else if ($isOverwrite OR !array_key_exists($k, $this->headers)) $this->headers[$k] = $v;
-        }
-    }
-
     protected function generateDefaultHeaders() : void {
         $headers = [];
         $url = $this->getUrl();
@@ -127,32 +65,6 @@ class Resource implements Trigger {
         $headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
         $this->addHeaders($headers);
-    }
-
-    protected function headersToString() : String {
-        $sHeaders = '';
-        foreach($this->headers as $k => $v) {
-            if (is_numeric($k)) $sHeaders .= $v . static::$eol;
-            else $sHeaders .= $k . ': ' . $v . static::$eol;
-        }
-        return $sHeaders;
-    }
-
-    protected static function getDefaultPort(String $scheme) : int {
-        switch ($scheme) {
-            case 'https':
-                $defaultPort = 443;
-                break;
-
-            case 'http':
-                $defaultPort = 80;
-                break;
-
-            default:
-                $defaultPort = 80;
-        }
-
-        return $defaultPort;
     }
 
     protected function readResponse($socket): string {
@@ -203,8 +115,4 @@ class Resource implements Trigger {
 
         return $respBody;
     }
-    
-	public static function allowSingleton() : bool {
-		return true;
-	}
 }
