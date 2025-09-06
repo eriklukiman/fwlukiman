@@ -2,6 +2,7 @@
 #-------------------------
 /nbproject/
 .idea/*
+vendor
 
 ## Sublime Text cache files
 *.tmlanguage.cache
