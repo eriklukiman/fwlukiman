@@ -74,7 +74,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		return true;
 	}
 
-	public static function Update (Database $db, String $table = '', array $arrValues = [], array|String $where = '1', array $bindVars = [], String $join = '') : int {
+	public static function Update (Database $db, String $table = '', array $arrValues = [], array|String $where = ' TRUE ', array $bindVars = [], String $join = '') : int {
 		$startTrans = false;
 		if (!$db->inTransaction()) {
 			$db->beginTransaction ();
@@ -165,7 +165,7 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		else return 0;
 	}
 
-	public static function Select (Database $db, String $table = '', array|String $arrColumn = '*', array|String $where = '1', array $bindVars = [], String $join = '', String $order = '', String $group = '', String $having = '', null|array|int $limit = null, bool $isGrid = false) : mixed {
+	public static function Select (Database $db, String $table = '', array|String $arrColumn = '*', array|String $where = ' TRUE ', array $bindVars = [], String $join = '', String $order = '', String $group = '', String $having = '', null|array|int $limit = null, bool $isGrid = false) : mixed {
 		$arrData = array();
 
 		if (!empty($arrColumn) AND is_array($arrColumn)) {
@@ -231,13 +231,13 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 
 	}
 
-	public static function generateWhere (array|String $where = '1', ?Database $db = null) : String {
+	public static function generateWhere (array|String $where = ' TRUE ', ?Database $db = null) : String {
 		$dbSupplied = true;
 		if (is_null($db)) {
 			$db = self::getInstance('');
 			$dbSupplied = false;
 		}
-		$retVal = ' 1 ';
+		$retVal = ' TRUE ';
 		if (is_array($where)) {
 			foreach($where as $k => $v) {
 				if (is_array($v)) {
