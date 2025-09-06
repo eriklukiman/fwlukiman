@@ -1,2 +1,14 @@
-composer.lock
-/vendor/*
+# IDE Files
+#-------------------------
+/nbproject/
+.idea/*
+
+## Sublime Text cache files
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Ignore all files in config that have two extensions like .staging.php
+config/*.*.php

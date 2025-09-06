@@ -21,7 +21,7 @@ class Memcached extends Base implements ICache {
 	}
 
 	public function set(String $id, mixed $value, ?int $ttl = 0) : bool {
-		return $this->cache->set($this->getPrefix() . $id, $value, 0);
+		return $this->cache->set($this->getPrefix() . $id, $value, $ttl);
 	}
 
 	public function delete(String $id) : bool {

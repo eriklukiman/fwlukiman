@@ -13,11 +13,14 @@
             "Lukiman\\": ""
         }
     },
+    "scripts": {
+        "test": "phpunit --bootstrap includes/const.php --testdox --display-notices --display-warnings --display-deprecations tests"
+    },
     "require": {
         "nyholm/psr7-server": "^1.0",
         "nyholm/psr7": "^1.2",
         "swlib/swpdo": "dev-master",
-        "beberlei/assert": "^3.2",
+        "beberlei/assert": "^3.3",
         "ilexn/swoole-convert-psr7": "^0.3.0",
         "spatie/array-to-xml": "^3.1"
     },

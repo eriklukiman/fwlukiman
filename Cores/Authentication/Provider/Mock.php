@@ -12,7 +12,7 @@ class Mock extends Base implements IAuthentication {
 		$authData = new AuthData();
 		$authData->setUserName('test@test.com');
 		$authData->setEmail('test@test.com');
-		$authData->setExpired(strtotime("+1 year"));
+		$authData->setExpired(time() + $this->ttl);
 		$this->credentials = $authData;
 	}
 	
