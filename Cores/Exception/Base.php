@@ -2,7 +2,7 @@
 namespace Lukiman\Cores\Exception;
 
 class Base extends \Exception {
-	public const HTTP_CODE = 404;
+	public const HTTP_CODE = 500;
 	protected static $errorCount = 0;
 	
 	public function __construct($message, $code = 0, $severity = null, $filename = null, $lineno = null) {
