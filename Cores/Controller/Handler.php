@@ -64,9 +64,9 @@ class Handler {
                 }
                 echo json_encode([
                     'status' => [
-                        'error'		=> true,
-                        'errorCode'	=> $e->getCode(),
-                        'message' 	=> $e->getMessage()
+                        'error'     => true,
+                        'errorCode' => $e->getCode(),
+                        'message'   => $e->getMessage()
                     ]
                 ]);
             }
