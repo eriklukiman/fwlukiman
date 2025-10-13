@@ -112,7 +112,7 @@ class Socket extends Base implements Trigger {
     //  3. Send the request
     // ----------------------------------------------------------
     $request = $this->buildRequest();
-    $request = str_replace("\r\n", "\n", $request); // normalize once
+    // $request = str_replace("\r\n", "\n", $request); // normalize once
     $written = 0;
     $len     = strlen($request);
 
