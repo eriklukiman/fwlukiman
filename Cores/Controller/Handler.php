@@ -3,11 +3,12 @@
 namespace Lukiman\Cores\Controller;
 
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
+use Lukiman\Cores\Exception\NotFoundException;
 use \Lukiman\Cores\HttpStatus;
 
-function hasClassConstant($objectOrClass, string $constName): bool {
+function hasClassMethod($objectOrClass, string $methodName): bool {
     $reflection = new \ReflectionClass($objectOrClass);
-    return $reflection->hasConstant($constName);
+    return $reflection->hasMethod($methodName);
 }
 
 class Handler {
@@ -22,7 +23,7 @@ class Handler {
             
             $_path = $path;
             foreach ($path as $k => $v) {
-                $path[$k] = preg_replace_callback('/(\_[a-z])/', function ($word) {
+                $path[$k] = preg_replace_callback('/(_[a-z])/', function ($word) {
                     return strtoupper($word[1]);
                 }, ucwords(strtolower($v)));
             }
@@ -41,7 +42,7 @@ class Handler {
 
             try {
                 if (empty($class)) {
-                    throw new ExceptionBase('Handler not found!', 404);
+                    throw new NotFoundException('Handler not found!', 404);
                 }
                 Base::set_action($action);
 
@@ -49,13 +50,13 @@ class Handler {
                 $retVal = $ctrl->execute($action, $params);
                 $ctrl->sendHeaders();
                 echo $retVal;
-            } catch (ExceptionBase | \PDOException $e) {
+            } catch (\Throwable | ExceptionBase $e) {
                 if (!headers_sent()) {
-                    $httpCode = 404;
+                    $httpCode = 500;
                     
-                    if (hasClassConstant($e, 'HTTP_CODE')) {
-                        if (HttpStatus::isValid($e::HTTP_CODE)) {
-                            $httpCode = $e::HTTP_CODE;
+                    if (hasClassMethod($e, 'getHttpCode')) {
+                        if (HttpStatus::isValid($e->getHttpCode())) {
+                            $httpCode = $e->getHttpCode();
                         }
                     }
                     $httpMessage = HttpStatus::getMessage($httpCode);

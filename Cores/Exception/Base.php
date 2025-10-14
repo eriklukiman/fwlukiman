@@ -51,4 +51,8 @@ class Base extends \Exception {
 			return static::$errorCount->get();
 		}
 	}
+
+	public function getHttpCode() {
+		return self::HTTP_CODE;
+	}
 }
