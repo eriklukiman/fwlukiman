@@ -2,6 +2,13 @@
 
 namespace Lukiman\Cores\Exception;
 
+/**
+ * Exception thrown when a user's session has expired.
+ *
+ * This exception sets the HTTP response code to 401 (Unauthorized).
+ *
+ * @package Cores\Exception
+ */
 class ExpiredSessionException extends Base {
-    public const HTTP_CODE = 401;
+    protected int $httpCode = 401;
 }

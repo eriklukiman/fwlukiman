@@ -2,6 +2,11 @@
 
 namespace Lukiman\Cores\Exception;
 
+/**
+ * Exception thrown when a user does not have the required permissions to access a resource.
+ *
+ * Sets the HTTP response code to 403 (Forbidden).
+ */
 class PermissionDeniedException extends Base {
-    public const HTTP_CODE = 403;
+    protected int $httpCode = 403;
 }
