@@ -4,7 +4,6 @@ namespace Lukiman\Cores\Controller;
 
 use \Lukiman\Cores\Exception\Base as ExceptionBase;
 use Lukiman\Cores\Exception\NotFoundException;
-use \Lukiman\Cores\HttpStatus;
 
 function hasClassMethod($objectOrClass, string $methodName): bool {
     $reflection = new \ReflectionClass($objectOrClass);
@@ -55,12 +54,9 @@ class Handler {
                     $httpCode = 500;
                     
                     if (hasClassMethod($e, 'getHttpCode')) {
-                        if (HttpStatus::isValid($e->getHttpCode())) {
-                            $httpCode = $e->getHttpCode();
-                        }
+                        $httpCode = $e->getHttpCode();
                     }
-                    $httpMessage = HttpStatus::getMessage($httpCode);
-                    header("HTTP/1.0 $httpCode $httpMessage");
+                    http_response_code($httpCode);
                     header('Content-Type: application/json');
                 }
                 echo json_encode([
