@@ -6,6 +6,7 @@ namespace Lukiman\tests\Cores;
 
 use Lukiman\Cores\Env;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Lukiman\Cores\Loader;
 use ReflectionClass;
 use ReflectionMethod;
@@ -50,9 +51,7 @@ final class LoaderTest extends TestCase {
     ];
   }
 
-  /**
-   * @dataProvider envResolveDataProvider
-   */
+  #[DataProvider('envResolveDataProvider')]
   public function testResolveEnvMethodOutput(Env $env, string $expectedPath): void {
     $file = 'DummyConfig';
     $expected = 'config/' . $file . $expectedPath . '.php';
