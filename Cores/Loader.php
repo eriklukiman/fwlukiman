@@ -10,7 +10,7 @@ class Loader {
 	protected static $_assetsHtml   = 'Html/';
 	protected static $_assetsImage   = 'Images/';
     
-    protected static ?Env $env;
+    protected static Env $env;
 
 	public static function Load(String $module) : void {
 		self::Include_File($module);
@@ -42,7 +42,7 @@ class Loader {
         if (is_readable($file)) $env = include($file);
 		else if (is_readable(ROOT_PATH . $file)) $env = include_once(ROOT_PATH . $file);
 		else if (is_readable(LUKIMAN_ROOT_PATH . $file)) $env = include_once(LUKIMAN_ROOT_PATH . $file);
-        return $env instanceof Env ? $env : null;
+        return $env instanceof Env ? self::$env = $env : null;
     }
 
     /**
