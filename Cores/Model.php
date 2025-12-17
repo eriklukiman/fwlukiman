@@ -93,7 +93,7 @@ class Model {
     			ordinal_position');
 		$q->execute(['schema' => $schema, 'table' => $table]);
 		$fields = $q->fetchAll(\PDO::FETCH_ASSOC);
-		if (empty($q)) {
+		if (empty($fields)) {
 			throw new ExceptionBase('Table ' . $this->getTable() . ' is not exist!');
 		}
 		$result = [];
