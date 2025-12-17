@@ -70,13 +70,34 @@ class Model {
 		if (!empty($this->fields)) return $this->fields;
 		$prefix = $this->getPrefix();
 		$db = Database::getInstance();
-		$q = $db->query("DESCRIBE " . $this->getTable());
+		$schemaAndTable = explode('.', $this->getTable());
+		$schema = 'public';
+		$table = $this->getTable();
+		if (isset($schemaAndTable[1])) {
+			$schema = $schemaAndTable[0];
+			$table = $schemaAndTable[1];
+		}
+
+		$q = $db->prepare('
+			SELECT 
+    			column_name as "Field", 
+    			data_type as "Type", 
+    			is_nullable as "Null", 
+    			column_default as "Default"
+			FROM 
+    			information_schema.columns
+			WHERE 
+				table_schema = :schema and   
+				table_name = :table
+			ORDER BY 
+    			ordinal_position');
+		$q->execute(['schema' => $schema, 'table' => $table]);
+		$fields = $q->fetchAll(\PDO::FETCH_ASSOC);
 		if (empty($q)) {
 			throw new ExceptionBase('Table ' . $this->getTable() . ' is not exist!');
 		}
 		$result = [];
-		foreach ($q as $v) {
-			$v = (array) $v;
+		foreach ($fields as $v) {
 			$result[$v['Field']] = $v;
 		}
 		return $result;

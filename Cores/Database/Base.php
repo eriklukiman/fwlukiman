@@ -189,11 +189,11 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		if (!empty($order)) $orderBy .= ' ORDER BY ' . $order;
 		if (!empty($having)) $useHaving .= ' HAVING ' . $having;
 		if (!empty($limit)) {
-			if (is_array($limit) AND isset($limit[1])) $useLimit .= ' LIMIT :_usedLimit0, :_usedLimit1 ';
+			if (is_array($limit) AND isset($limit[1])) $useLimit .= ' LIMIT :_usedLimit1 OFFSET :_usedLimit0 ';
 			else $useLimit .= ' LIMIT :_usedLimit0 ';
 		}
 
-		$q = $db->prepare('SELECT ' . ($isGrid ? ' SQL_CALC_FOUND_ROWS ' : '') . implode(', ', $arrData) . ' FROM ' . $table . ($join == '' ? '' : $join) . ' WHERE ' . self::generateWhere($where, $db) . $groupBy . $orderBy . $useHaving . $useLimit );
+		$q = $db->prepare('SELECT ' . implode(', ', $arrData) . ' FROM ' . $table . ($join == '' ? '' : $join) . ' WHERE ' . self::generateWhere($where, $db) . $groupBy . $orderBy . $useHaving . $useLimit );
 
 		if ($q === false) {
 			var_dump($db);

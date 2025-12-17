@@ -69,7 +69,8 @@ class Grid extends Select {
 	public function countData (?Database $db = null) : self {
 		if (empty($this->_totalRows)) {
 			$db = $this->getValidDb($db);
-			$rs1 = $db->query('SELECT FOUND_ROWS() ');
+			// $rs1 = $db->query('SELECT FOUND_ROWS() ');
+			$rs1 = Database::Select($db, $this->_table, ['COUNT(*) as found_rows'], $this->_where, $this->_bindVars, $this->_join, $this->_groupBy);
 			// $this->_rows = $this->count();
 			$this->_rows = $this->_dbStatement->rowCount();
 			if(empty($this->_rows) AND isset($this->_dbStatement->result_set)) $this->_rows = count($this->_dbStatement->result_set);
