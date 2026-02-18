@@ -3,6 +3,7 @@ namespace Lukiman\Cores\Exception;
 
 class Base extends \Exception {
 	protected static $errorCount = 0;
+	protected int $httpCode = 400;
 	
 	public function __construct($message, $code = 0, $severity = null, $filename = null, $lineno = null) {
 		parent::__construct($message, $code);
@@ -49,5 +50,9 @@ class Base extends \Exception {
 		} else {
 			return static::$errorCount->get();
 		}
+	}
+
+	public function getHttpCode(): int {
+		return $this->httpCode;
 	}
 }
