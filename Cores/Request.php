@@ -205,6 +205,14 @@ class Request {
         return $this->getUri()->getQuery();
     }
 
-}
+    public function addQueryArray(array $query) : self {
+        $this->get = array_merge($this->get, $query);
+        return $this;
+    }
 
-?>
+    public function addQueryString(String $key, String $value) : self {
+        $this->get[$key] = $value;
+        return $this; 
+    }
+
+}
