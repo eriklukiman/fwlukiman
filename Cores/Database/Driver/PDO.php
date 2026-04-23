@@ -45,7 +45,7 @@ class PDO extends \PDO implements Basic, Transaction {
 		return static::$_instance;
 	}
 
-	public function toQuote($string) : String {
+	public function toQuote(String $string) : String {
 		return parent::quote($string);
 	}
 

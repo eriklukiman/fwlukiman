@@ -76,7 +76,7 @@ class Query {
 		return $this;
 	}
 
-	public function where(null|String|array $where, mixed $value = null, String $operator = '=') : self {
+	public function buildWhere(String $where, mixed $value = null, String $operator = '=') : String {
 		if ((trim($operator) == 'IN') OR (trim($operator) == 'NOT IN')) {
 			if (!empty($value)) {
 				if (is_array($value)) {
@@ -98,22 +98,50 @@ class Query {
 		} else if ($value !== null) {
 			$_var = Database::generateRandomVariable();
 			$this->_bindVars[$_var] = $value;
-			$where .= ' ' . $operator . ' ' . $_var; //Database::getInstance('')->toQuote($value);
+			$where .= ' ' . $operator . ' ' . $_var;
+		} else if (is_null($value) AND in_array(strtoupper(trim($operator)), ['IS', 'IS NOT'])) {
+			$where .= ' ' . $operator . ' NULL';
+		} else if(is_null($value)) {
+			$where .= ' IS NULL';
 		}
-		if (!empty($this->_where)) {
-			if (is_array($where)) {
-				if (is_array($this->_where)) $this->_where = array_merge($this->_where, $where);
-				else $this->_where .= ' AND ' . Database::generateWhere($where);
-				/*foreach($where as $kW => $vW) {
-					$_var = Database::generateRandomVariable();
-					$this->_bindVars[$_var] = $value;
-					$this->_where .= ' ' . $operator . ' ' . $_var;
-				}*/
-			} else {
-				if (is_array($this->_where)) $this->_where = Database::generateWhere($this->_where) . ' AND ' . $where;
-				else $this->_where .= ' AND ' . $where;
+		return $where;
+	}
+
+	public function orWhere(String|array $where, mixed $value = null, ?String $operator = '=') : self {
+		return $this->where($where, $value, $operator, 'OR');
+	}
+
+	public function where(String|array $where, mixed $value = null, ?String $operator = '=', String $condition = 'AND') : self {
+		if (is_null($operator)) $operator = '=';
+		$condition = strtoupper(trim($condition));
+		if (!in_array($condition, ['AND', 'OR'])) $condition = 'AND';
+
+		$usedWhere = [];
+		if (is_string($where)) {
+			$usedWhere[] = $this->buildWhere($where, $value, $operator);
+		} else {
+			foreach ($where as $k => $v) {
+				if (is_array($v)) {
+					if(count($v) == 2) $usedWhere[] = $this->buildWhere($k, $v[1], $v[0]);
+					else $usedWhere[] = $this->buildWhere($v[0], $v[2], $v[1]);
+				} else {
+					$usedWhere[] = $this->buildWhere($k, $v, $operator);
+				}
 			}
-		} else $this->_where = $where;
+		}
+		if ($condition != 'AND') {
+			$usedWhere = ' ( ' . Database::generateWhere($usedWhere, null, $condition) . ' ) ';
+		}
+		
+		if (!empty($this->_where)) {
+			if (is_array($usedWhere)) {
+				if (is_array($this->_where)) $this->_where = array_merge($this->_where, $usedWhere);
+				else $this->_where .= " {$condition} " . Database::generateWhere($usedWhere, null, $condition);
+			} else {
+				if (is_array($this->_where)) $this->_where = Database::generateWhere($this->_where, null, $condition) . " {$condition} " . $usedWhere;
+				else $this->_where .= " {$condition} " . $usedWhere;
+			}
+		} else $this->_where = $usedWhere;
 
 		return $this;
 	}

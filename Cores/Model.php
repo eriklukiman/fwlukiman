@@ -149,5 +149,6 @@ class Model {
 		$q = $this->getDb()->query('SELECT NOW() AS time ');
 		$this->getDb()->releaseConnection();
 		foreach($q as $v) return $v->time;
+		return null;
 	}
 }

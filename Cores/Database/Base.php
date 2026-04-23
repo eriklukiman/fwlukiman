@@ -194,7 +194,6 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 		}
 
 		$q = $db->prepare('SELECT ' . ($isGrid ? ' SQL_CALC_FOUND_ROWS ' : '') . implode(', ', $arrData) . ' FROM ' . $table . ($join == '' ? '' : $join) . ' WHERE ' . self::generateWhere($where, $db) . $groupBy . $orderBy . $useHaving . $useLimit );
-
 		if ($q === false) {
 			var_dump($db);
 			return new \stdClass();
@@ -231,20 +230,20 @@ class Base extends PDO /*Swoole*/ implements Basic, Transaction, Operation {
 
 	}
 
-	public static function generateWhere (array|String $where = ' TRUE ', ?Database $db = null) : String {
+	public static function generateWhere (array|String $where = ' TRUE ', ?Database $db = null, String $condition = 'AND') : String {
 		$dbSupplied = true;
 		if (is_null($db)) {
-			$db = self::getInstance('');
+			$db = self::getInstance();
 			$dbSupplied = false;
 		}
-		$retVal = ' TRUE ';
+		$retVal = $condition == 'AND' ? ' TRUE ' : ' FALSE ';
 		if (is_array($where)) {
 			foreach($where as $k => $v) {
 				if (is_array($v)) {
 					foreach ($v as $kV => $vV) $v[$kV] = $db->toQuote($vV);
-					$retVal .= ' AND ' . $k . ' IN (' . implode(', ', $v) . ' ) ' ;
+					$retVal .= ' ' . $condition . ' ' . $k . ' IN (' . implode(', ', $v) . ' ) ' ;
 				} else {
-					$retVal .= ' AND ' . $k . ' = ' . $db->toQuote($v);
+					$retVal .= ' ' . $condition . ' ' . $v;// ' AND ' . $k . ' = ' . $db->toQuote($v);
 				}
 			}
 			if (!$dbSupplied) $db->releaseConnection();
