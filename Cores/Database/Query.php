@@ -101,8 +101,6 @@ class Query {
 			$where .= ' ' . $operator . ' ' . $_var;
 		} else if (is_null($value) AND in_array(strtoupper(trim($operator)), ['IS', 'IS NOT'])) {
 			$where .= ' ' . $operator . ' NULL';
-		} else if(is_null($value)) {
-			$where .= ' IS NULL';
 		}
 		return $where;
 	}
