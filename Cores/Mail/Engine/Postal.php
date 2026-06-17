@@ -5,7 +5,9 @@ class Postal extends Base {
 	public function simpleSend(String $to, String $from, String $subject, String $message) : bool {
 
 		//post data to postal server
-		$url = "https://{$this->config['host']}/api/v1/send/message";
+		$scheme = $this->config['scheme'] ?? 'https';
+		$port = !empty($this->config['port']) ? ':' . intval($this->config['port']) : '';
+		$url = "{$scheme}://{$this->config['host']}{$port}/api/v1/send/message";
 		$data = array(
 			"from" => $from,
 			"to" => $to,
